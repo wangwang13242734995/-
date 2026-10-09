@@ -36,10 +36,13 @@ RUN addgroup --system --gid 1001 nodejs \
  COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
  COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
- # 复制 Prisma 相关文件（运行时 push/migrate 需要）
+ # 复制 Prisma 相关文件（运行时需要）
  COPY --from=builder /app/prisma ./prisma
  COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
  COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+ # 复制数据库初始化脚本
+ COPY --chown=nextjs:nodejs ./scripts ./scripts
 
  # SQLite 数据目录（挂载持久卷时使用）
  RUN mkdir -p /data && chown nextjs:nodejs /data
@@ -50,6 +53,6 @@ RUN addgroup --system --gid 1001 nodejs \
  ENV PORT=3000
  ENV HOSTNAME="0.0.0.0"
 
- # 启动：先同步数据库 schema，再启动 Next.js
- CMD ["sh", "-c", "npx prisma db push --skip-generate 2>/dev/null; node server.js"]
+ # 启动：先确保数据库表存在，再启动 Next.js
+ CMD ["sh", "-c", "node scripts/init-db.js && node server.js"]
  

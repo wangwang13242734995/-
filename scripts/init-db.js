@@ -1,0 +1,196 @@
+/**
+ * Database initialization script for Railway/production deployment.
+ * Creates tables via raw SQL if they don't exist (based on Prisma schema).
+ * Called at container startup before the Next.js server starts.
+ */
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+async function ensureTables() {
+  const statements = [
+    `CREATE TABLE IF NOT EXISTS "User" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "email" TEXT NOT NULL UNIQUE,
+      "password" TEXT NOT NULL,
+      "role" TEXT NOT NULL DEFAULT 'STUDENT',
+      "avatar" TEXT,
+      "school" TEXT,
+      "major" TEXT,
+      "graduationYear" INTEGER,
+      "bio" TEXT,
+      "skills" TEXT NOT NULL DEFAULT '[]',
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" DATETIME NOT NULL
+    )`,
+    `CREATE TABLE IF NOT EXISTS "Project" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "title" TEXT NOT NULL,
+      "type" TEXT NOT NULL,
+      "role" TEXT NOT NULL,
+      "teamSize" INTEGER NOT NULL DEFAULT 1,
+      "startDate" DATETIME NOT NULL,
+      "endDate" DATETIME,
+      "techStack" TEXT NOT NULL DEFAULT '[]',
+      "description" TEXT NOT NULL,
+      "difficulty" TEXT,
+      "outcome" TEXT,
+      "outcomeType" TEXT NOT NULL DEFAULT 'NONE',
+      "outcomeData" TEXT,
+      "difficultyEncountered" TEXT,
+      "solution" TEXT,
+      "githubLink" TEXT,
+      "designLink" TEXT,
+      "videoLink" TEXT,
+      "liveLink" TEXT,
+      "attachments" TEXT NOT NULL DEFAULT '[]',
+      "status" TEXT NOT NULL DEFAULT 'DRAFT',
+      "credibilityScore" INTEGER NOT NULL DEFAULT 0,
+      "problemAnalysis" TEXT NOT NULL DEFAULT '{}',
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" DATETIME NOT NULL,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "AbilityScore" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "craft" REAL NOT NULL DEFAULT 30,
+      "learn" REAL NOT NULL DEFAULT 30,
+      "drive" REAL NOT NULL DEFAULT 30,
+      "team" REAL NOT NULL DEFAULT 30,
+      "grit" REAL NOT NULL DEFAULT 30,
+      "express" REAL NOT NULL DEFAULT 30,
+      "totalScore" REAL NOT NULL DEFAULT 30,
+      "calculatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "GrowthRecord" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "projectId" TEXT,
+      "type" TEXT NOT NULL,
+      "title" TEXT NOT NULL,
+      "content" TEXT NOT NULL,
+      "abilitySignals" TEXT NOT NULL DEFAULT '[]',
+      "date" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE,
+      FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE SET NULL
+    )`,
+    `CREATE TABLE IF NOT EXISTS "WeeklyReport" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "weekStart" DATETIME NOT NULL,
+      "weekEnd" DATETIME NOT NULL,
+      "recordCount" INTEGER NOT NULL DEFAULT 0,
+      "abilityChanges" TEXT NOT NULL DEFAULT '{}',
+      "hoursInvested" REAL NOT NULL DEFAULT 0,
+      "aiSuggestion" TEXT,
+      "generatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "TimeCapsule" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "goal" TEXT NOT NULL,
+      "writtenAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "openDates" TEXT NOT NULL DEFAULT '[]',
+      "openedAt" DATETIME,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "Enterprise" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL UNIQUE,
+      "companyName" TEXT NOT NULL,
+      "logo" TEXT,
+      "industry" TEXT,
+      "description" TEXT,
+      "website" TEXT,
+      "status" TEXT NOT NULL DEFAULT 'PENDING',
+      "rejectReason" TEXT,
+      "verifiedAt" DATETIME,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" DATETIME NOT NULL,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "Challenge" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "enterpriseId" TEXT NOT NULL,
+      "title" TEXT NOT NULL,
+      "description" TEXT NOT NULL,
+      "category" TEXT NOT NULL,
+      "requirements" TEXT,
+      "maxParticipants" INTEGER NOT NULL DEFAULT 100,
+      "duration" INTEGER NOT NULL DEFAULT 14,
+      "startDate" DATETIME NOT NULL,
+      "endDate" DATETIME NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'DRAFT',
+      "rewardType" TEXT NOT NULL DEFAULT 'CERTIFICATE',
+      "rewardDetail" TEXT,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" DATETIME NOT NULL,
+      FOREIGN KEY ("enterpriseId") REFERENCES "Enterprise"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "ChallengeParticipation" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "challengeId" TEXT NOT NULL,
+      "submission" TEXT,
+      "links" TEXT NOT NULL DEFAULT '[]',
+      "status" TEXT NOT NULL DEFAULT 'IN_PROGRESS',
+      "submittedAt" DATETIME,
+      "reviewedAt" DATETIME,
+      "feedback" TEXT,
+      "rank" INTEGER,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" DATETIME NOT NULL,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE,
+      FOREIGN KEY ("challengeId") REFERENCES "Challenge"("id") ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "Credential" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "type" TEXT NOT NULL,
+      "title" TEXT NOT NULL,
+      "issuer" TEXT NOT NULL,
+      "description" TEXT,
+      "verifyCode" TEXT NOT NULL UNIQUE,
+      "verifyUrl" TEXT,
+      "issuedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE
+    )`,
+    // Indexes
+    `CREATE INDEX IF NOT EXISTS "Project_userId_idx" ON "Project"("userId")`,
+    `CREATE INDEX IF NOT EXISTS "AbilityScore_userId_idx" ON "AbilityScore"("userId")`,
+    `CREATE INDEX IF NOT EXISTS "GrowthRecord_userId_idx" ON "GrowthRecord"("userId")`,
+    `CREATE INDEX IF NOT EXISTS "GrowthRecord_projectId_idx" ON "GrowthRecord"("projectId")`,
+    `CREATE INDEX IF NOT EXISTS "WeeklyReport_userId_idx" ON "WeeklyReport"("userId")`,
+    `CREATE INDEX IF NOT EXISTS "TimeCapsule_userId_idx" ON "TimeCapsule"("userId")`,
+    `CREATE INDEX IF NOT EXISTS "Challenge_enterpriseId_idx" ON "Challenge"("enterpriseId")`,
+    `CREATE INDEX IF NOT EXISTS "Challenge_status_idx" ON "Challenge"("status")`,
+    `CREATE INDEX IF NOT EXISTS "ChallengeParticipation_challengeId_idx" ON "ChallengeParticipation"("challengeId")`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS "ChallengeParticipation_userId_challengeId_key" ON "ChallengeParticipation"("userId", "challengeId")`,
+    `CREATE INDEX IF NOT EXISTS "Credential_userId_idx" ON "Credential"("userId")`,
+  ];
+
+  for (const sql of statements) {
+    try {
+      await prisma.$executeRawUnsafe(sql);
+    } catch (e) {
+      // Ignore "already exists" errors
+      if (!e.message.includes("already exists")) {
+        console.warn("SQL warning:", e.message.slice(0, 100));
+      }
+    }
+  }
+
+  console.log("Database tables ensured successfully");
+}
+
+ensureTables()
+  .catch((e) => {
+    console.error("DB init error:", e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());
