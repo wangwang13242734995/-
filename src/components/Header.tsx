@@ -43,10 +43,9 @@ export function Header() {
                 项目
               </Link>
               {/* Challenge dropdown */}
-              <div className="relative">
+              <div className="relative" onMouseLeave={() => setChallengeOpen(false)}>
                 <button
                   onClick={() => setChallengeOpen(!challengeOpen)}
-                  onMouseLeave={() => setChallengeOpen(false)}
                   className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors inline-flex items-center gap-1"
                   style={{ fontWeight: 460 }}
                 >
@@ -73,6 +72,9 @@ export function Header() {
             </>
           ) : (
             <>
+              <Link href="/challenges" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
+                挑战赛
+              </Link>
               <a href="#features" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
                 功能
               </a>

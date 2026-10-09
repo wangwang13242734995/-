@@ -3,24 +3,31 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const token = req.nextauth.token;
-    const pathname = req.nextUrl.pathname;
-
-    if (pathname.startsWith("/dashboard") || pathname.startsWith("/projects") || pathname.startsWith("/records") || pathname.startsWith("/weekly-review") || pathname.startsWith("/my-challenges")) {
-      if (!token) {
-        return NextResponse.redirect(new URL("/auth/login", req.url));
-      }
-    }
-
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => {
+        // 如果未登录，只有非注册页面才需要跳转
+        if (!token) return false;
+        return true;
+      },
+    },
+    pages: {
+      signIn: "/auth/login",
     },
   }
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/projects/:path*", "/enterprise/:path*", "/time-capsule/:path*", "/records/:path*", "/settings/:path*", "/weekly-review/:path*", "/my-challenges/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/projects/:path*",
+    "/records/:path*",
+    "/weekly-review/:path*",
+    "/my-challenges/:path*",
+    "/enterprise/dashboard/:path*",
+    "/profile/edit/:path*",
+    "/time-capsule/:path*",
+  ],
 };
