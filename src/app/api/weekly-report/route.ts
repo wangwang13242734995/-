@@ -65,22 +65,25 @@ export async function POST(req: NextRequest) {
 
     const lastWeekStart = new Date(weekStart);
     lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-    const lastWeekEnd = new Date(lastWeekStart);
-    lastWeekEnd.setDate(lastWeekStart.getDate() + 6);
 
-    const lastWeekReport = await prisma.weeklyReport.findFirst({
-      where: { userId, weekStart: lastWeekStart, weekEnd: lastWeekEnd },
+    const previousScore = await prisma.abilityScore.findFirst({
+      where: { userId, calculatedAt: { lt: weekStart } },
+      orderBy: { calculatedAt: "desc" },
     });
 
     const abilityChanges: Record<string, number> = {};
-    if (currentScores && lastWeekReport) {
-      const lastChanges = JSON.parse(lastWeekReport.abilityChanges as string || "{}") as Record<string, number>;
-      abilityChanges.craft = currentScores.craft - (lastChanges.craft || 30);
-      abilityChanges.learn = currentScores.learn - (lastChanges.learn || 30);
-      abilityChanges.drive = currentScores.drive - (lastChanges.drive || 30);
-      abilityChanges.team = currentScores.team - (lastChanges.team || 30);
-      abilityChanges.grit = currentScores.grit - (lastChanges.grit || 30);
-      abilityChanges.express = currentScores.express - (lastChanges.express || 30);
+    if (currentScores) {
+      const prev = previousScore || { craft: 30, learn: 30, drive: 30, team: 30, grit: 30, express: 30, totalScore: 30 };
+      abilityChanges.craft = Math.round((currentScores.craft - prev.craft) * 10) / 10;
+      abilityChanges.learn = Math.round((currentScores.learn - prev.learn) * 10) / 10;
+      abilityChanges.drive = Math.round((currentScores.drive - prev.drive) * 10) / 10;
+      abilityChanges.team = Math.round((currentScores.team - prev.team) * 10) / 10;
+      abilityChanges.grit = Math.round((currentScores.grit - prev.grit) * 10) / 10;
+      abilityChanges.express = Math.round((currentScores.express - prev.express) * 10) / 10;
+      abilityChanges.totalScore = Math.round((currentScores.totalScore - prev.totalScore) * 10) / 10;
+      // Also store absolute values for reference
+      abilityChanges._abs_craft = currentScores.craft;
+      abilityChanges._abs_total = currentScores.totalScore;
     }
 
     const suggestions = generateSuggestions(records.length, projects.length, currentScores);

@@ -102,6 +102,17 @@ export default function ChallengeDetailPage() {
 
       <main className="flex-1 max-w-[800px] mx-auto w-full px-6 py-10 space-y-6">
         <Link href="/challenges" className="link-violet text-sm">&larr; 返回挑战赛列表</Link>
+
+        {/* Status banner */}
+        {(challenge.status === "CLOSED" || challenge.status === "COMPLETED") && (
+          <div className={`p-4 rounded-xl text-sm flex items-center gap-2 ${
+            challenge.status === "CLOSED" ? "bg-[#421d24]/5 text-[#421d24] border border-[#421d24]/20" : "bg-[#d4c7ff]/20 text-[#714cb6] border border-[#d4c7ff]"
+          }`}>
+            <span>{challenge.status === "CLOSED" ? "⚠️" : "✅"}</span>
+            {challenge.status === "CLOSED" ? "该挑战赛已关闭，不再接受新参与和提交" : "该挑战赛已完成，结果已公布"}
+          </div>
+        )}
+
         <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-[#d4c7ff] rounded-2xl flex items-center justify-center text-lg text-[#421d24]" style={{ fontWeight: 540 }}>
@@ -150,8 +161,8 @@ export default function ChallengeDetailPage() {
         )}
 
         {!isParticipating ? (
-          <button onClick={handleJoin} disabled={joining || daysLeft === 0} className="btn-primary w-full text-lg py-3">
-            {joining ? "加入中..." : daysLeft > 0 ? "参与挑战赛" : "已结束"}
+          <button onClick={handleJoin} disabled={joining || daysLeft === 0 || challenge.status !== "OPEN"} className="btn-primary w-full text-lg py-3">
+            {challenge.status !== "OPEN" ? "不可参与" : joining ? "加入中..." : daysLeft > 0 ? "参与挑战赛" : "已结束"}
           </button>
         ) : hasSubmitted ? (
           <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 border-l-4 border-l-[#0c4243] text-center">

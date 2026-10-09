@@ -51,6 +51,8 @@ export default function ProjectsPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [typeFilter, setTypeFilter] = useState<string>("ALL");
+  const [sortBy, setSortBy] = useState<"date" | "credibility">("date");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -67,6 +69,13 @@ export default function ProjectsPage() {
         .catch(() => setLoading(false));
     }
   }, [status, router]);
+
+  const filtered = projects
+    .filter((p) => typeFilter === "ALL" || p.type === typeFilter)
+    .sort((a, b) => {
+      if (sortBy === "credibility") return b.credibilityScore - a.credibilityScore;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   if (loading || status === "loading") {
     return (
@@ -93,7 +102,28 @@ export default function ProjectsPage() {
           </div>
         </div>
 
-        {projects.length === 0 ? (
+        {/* Filter & Sort bar */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {["ALL", "PERSONAL", "COURSE", "COMPETITION", "INTERNSHIP", "CHALLENGE"].map((type) => (
+              <button key={type} onClick={() => setTypeFilter(type)}
+                className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition ${
+                  typeFilter === type
+                    ? "bg-[#421d24] text-white"
+                    : "bg-white text-[#292827] border border-[#e3e3e2] hover:border-[#714cb6]"
+                }`}>
+                {type === "ALL" ? "全部" : TYPE_LABELS[type]}
+              </button>
+            ))}
+          </div>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "date" | "credibility")}
+            className="text-sm px-3 py-1.5 bg-white border border-[#e3e3e2] rounded-full text-[#292827] outline-none">
+            <option value="date">按时间排序</option>
+            <option value="credibility">按可信度排序</option>
+          </select>
+        </div>
+
+        {filtered.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📋</div>
             <h2 className="text-xl text-[#292827] mb-2" style={{ fontWeight: 460 }}>还没有项目记录</h2>
@@ -102,40 +132,48 @@ export default function ProjectsPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {projects.map((project) => (
-              <Link
+            {filtered.map((project) => (
+              <div
                 key={project.id}
-                href={`/projects/${project.id}`}
-                className="block bg-white border border-[#e3e3e2] rounded-2xl p-5 hover:border-[#714cb6] transition-all"
+                className="bg-white border border-[#e3e3e2] rounded-2xl p-5 hover:border-[#714cb6] transition-all relative group"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${TYPE_COLORS[project.type] || "bg-[#e3e3e2] text-[#666666]"}`}>
-                        {TYPE_LABELS[project.type] || project.type}
-                      </span>
-                      <CredibilityBadge score={project.credibilityScore} />
+                <Link href={`/projects/${project.id}`} className="block">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${TYPE_COLORS[project.type] || "bg-[#e3e3e2] text-[#666666]"}`}>
+                          {TYPE_LABELS[project.type] || project.type}
+                        </span>
+                        <CredibilityBadge score={project.credibilityScore} />
+                      </div>
+                      <h3 className="text-lg text-[#292827]" style={{ fontWeight: 540 }}>{project.title}</h3>
+                      <p className="text-sm text-[#666666] mt-1 line-clamp-2">{project.description}</p>
+                      <div className="flex items-center gap-4 mt-3 text-xs text-[#666666] opacity-70">
+                        <span>{project.role}</span>
+                        <span>{project.teamSize} 人团队</span>
+                        <span>{project.techStack.length} 项技术</span>
+                        {project.difficultyEncountered && <span>有解题记录</span>}
+                      </div>
                     </div>
-                    <h3 className="text-lg text-[#292827]" style={{ fontWeight: 540 }}>{project.title}</h3>
-                    <p className="text-sm text-[#666666] mt-1 line-clamp-2">{project.description}</p>
-                    <div className="flex items-center gap-4 mt-3 text-xs text-[#666666] opacity-70">
-                      <span>{project.role}</span>
-                      <span>{project.teamSize} 人团队</span>
-                      <span>{project.techStack.length} 项技术</span>
-                      {project.difficultyEncountered && <span>有解题记录</span>}
+                    <div className="ml-4 text-right">
+                      {project.outcome && (
+                        <p className="text-sm text-[#714cb6]" style={{ fontWeight: 540 }}>{project.outcome}</p>
+                      )}
+                      <div className="flex gap-1 mt-2">
+                        {project.githubLink && <span className="text-xs text-[#666666]">GitHub</span>}
+                        {project.liveLink && <span className="text-xs text-[#666666]">Live</span>}
+                      </div>
                     </div>
                   </div>
-                  <div className="ml-4 text-right">
-                    {project.outcome && (
-                      <p className="text-sm text-[#714cb6]" style={{ fontWeight: 540 }}>{project.outcome}</p>
-                    )}
-                    <div className="flex gap-1 mt-2">
-                      {project.githubLink && <span className="text-xs text-[#666666]">GitHub</span>}
-                      {project.liveLink && <span className="text-xs text-[#666666]">Live</span>}
-                    </div>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+                {/* Quick edit button */}
+                <Link
+                  href={`/projects/${project.id}/edit`}
+                  className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity px-2.5 py-1 bg-[#f2f0eb] border border-[#e3e3e2] rounded-lg text-xs text-[#666666] hover:text-[#714cb6] hover:border-[#714cb6]"
+                >
+                  编辑
+                </Link>
+              </div>
             ))}
           </div>
         )}

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 export function Header() {
   const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
+  const [challengeOpen, setChallengeOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -32,7 +33,7 @@ export function Header() {
         </Link>
 
         {/* Center Nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           {session ? (
             <>
               <Link href="/dashboard" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
@@ -41,9 +42,28 @@ export function Header() {
               <Link href="/projects" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
                 项目
               </Link>
-              <Link href="/challenges" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
-                挑战
-              </Link>
+              {/* Challenge dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setChallengeOpen(!challengeOpen)}
+                  onMouseLeave={() => setChallengeOpen(false)}
+                  className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors inline-flex items-center gap-1"
+                  style={{ fontWeight: 460 }}
+                >
+                  挑战
+                  <svg className={`w-3.5 h-3.5 transition-transform ${challengeOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {challengeOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-40 bg-white border border-[#e3e3e2] rounded-xl py-1.5 shadow-sm animate-slide-up">
+                    <Link href="/challenges" onClick={() => setChallengeOpen(false)} className="block px-4 py-2 text-sm text-[#292827] hover:bg-[#f2f0eb] transition">
+                      发现挑战
+                    </Link>
+                    <Link href="/my-challenges" onClick={() => setChallengeOpen(false)} className="block px-4 py-2 text-sm text-[#292827] hover:bg-[#f2f0eb] transition">
+                      我的挑战
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Link href="/records" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
                 记录
               </Link>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/Header";
+import { useToast } from "@/components/Toast";
 
 const PROJECT_TYPES = [
   { value: "COURSE", label: "课程作业" },
@@ -23,6 +24,7 @@ const OUTCOME_TYPES = [
 
 export default function NewProjectPage() {
   const router = useRouter();
+  const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [techInput, setTechInput] = useState("");
@@ -92,6 +94,22 @@ export default function NewProjectPage() {
       if (!res.ok) {
         setError(data.error || "创建失败");
         return;
+      }
+
+      // Toast notification for score changes
+      if (data.abilityChanges) {
+        const changes = data.abilityChanges;
+        const gain = Object.entries(changes)
+          .filter(([k]) => k !== "totalScore")
+          .sort(([, a], [, b]) => (b as number) - (a as number))[0];
+        if (gain && (gain[1] as number) > 0) {
+          const labels: Record<string, string> = { craft: "专业力", learn: "学习力", drive: "自驱力", team: "协作力", grit: "抗压力", express: "表达力" };
+          addToast(`项目已记录！${labels[gain[0]]} +${gain[1]}`);
+        } else {
+          addToast("项目记录成功，继续加油！");
+        }
+      } else {
+        addToast("项目记录成功！");
       }
 
       setAbilityChanges(data.abilityChanges);

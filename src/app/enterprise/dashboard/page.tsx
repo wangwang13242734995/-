@@ -25,11 +25,36 @@ const STATUS_LABELS: Record<string, { text: string; color: string }> = {
   REJECTED: { text: "已拒绝", color: "bg-[#421d24]/10 text-[#421d24]" },
 };
 
+const CHALLENGE_STATUS_LABELS: Record<string, string> = {
+  DRAFT: "草稿",
+  OPEN: "进行中",
+  CLOSED: "已关闭",
+  COMPLETED: "已完成",
+};
+
 export default function EnterpriseDashboardPage() {
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();
   const [enterprise, setEnterprise] = useState<EnterpriseInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [statusMsg, setStatusMsg] = useState("");
+
+  const updateChallengeStatus = async (challengeId: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/challenges/${challengeId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setStatusMsg(data.error); return; }
+      setStatusMsg(`挑战赛状态已更新为 ${CHALLENGE_STATUS_LABELS[newStatus] || newStatus}`);
+      setEnterprise((prev) => prev ? {
+        ...prev,
+        challenges: prev.challenges.map((c) => c.id === challengeId ? { ...c, status: newStatus } : c)
+      } : prev);
+    } catch { setStatusMsg("操作失败"); }
+  };
 
   useEffect(() => {
     if (authStatus === "unauthenticated") { router.push("/auth/login"); return; }
@@ -77,6 +102,10 @@ export default function EnterpriseDashboardPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
+        {statusMsg && (
+          <div className={`p-3 rounded-xl text-sm ${statusMsg.includes("失败") || statusMsg.includes("无权限") ? "bg-[#421d24]/10 text-[#421d24] border border-[#421d24]/20" : "bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20"}`}>{statusMsg}</div>
+        )}
+
         {enterprise.status === "PENDING" && (
           <div className="bg-white border border-[#d4c7ff] rounded-2xl p-4">
             <p className="text-[#714cb6]">你的企业认证正在审核中，审核通过后即可发布挑战赛。</p>
@@ -113,17 +142,38 @@ export default function EnterpriseDashboardPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
+                  {c.status === "DRAFT" && (
+                    <button onClick={() => updateChallengeStatus(c.id, "OPEN")} className="text-xs px-2 py-1 bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20 rounded-full hover:bg-[#0c4243]/20 transition">
+                      发布
+                    </button>
+                  )}
                   {c.status === "OPEN" && (
-                    <Link href={`/enterprise/challenges/${c.id}/review`} className="text-sm px-3 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
-                      评审作品
-                    </Link>
+                    <>
+                      <Link href={`/enterprise/challenges/${c.id}/review`} className="text-sm px-3 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
+                        评审作品
+                      </Link>
+                      <button onClick={() => updateChallengeStatus(c.id, "CLOSED")} className="text-xs px-2 py-1 bg-[#f2f0eb] text-[#666666] border border-[#e3e3e2] rounded-full hover:border-[#421d24] hover:text-[#421d24] transition">
+                        关闭
+                      </button>
+                    </>
+                  )}
+                  {c.status === "CLOSED" && (
+                    <>
+                      <button onClick={() => updateChallengeStatus(c.id, "OPEN")} className="text-xs px-2 py-1 bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20 rounded-full hover:bg-[#0c4243]/20 transition">
+                        重新开放
+                      </button>
+                      <button onClick={() => updateChallengeStatus(c.id, "COMPLETED")} className="text-xs px-2 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
+                        标记完成
+                      </button>
+                    </>
                   )}
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
                     c.status === "OPEN" ? "bg-[#0c4243]/10 text-[#0c4243]" :
                     c.status === "DRAFT" ? "bg-[#e3e3e2] text-[#666666]" :
-                    "bg-[#d4c7ff]/30 text-[#714cb6]" 
+                    c.status === "COMPLETED" ? "bg-[#d4c7ff]/30 text-[#714cb6]" :
+                    "bg-[#f2f0eb] text-[#666666]" 
                   }`}>
-                    {c.status}
+                    {CHALLENGE_STATUS_LABELS[c.status] || c.status}
                   </span>
                 </div>
               </div>

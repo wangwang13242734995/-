@@ -72,6 +72,12 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const data = submitSchema.parse(body);
 
+    // Check challenge is still open for submission
+    const challengeCheck = await prisma.challenge.findUnique({ where: { id: data.challengeId } });
+    if (!challengeCheck || challengeCheck.status === "CLOSED" || challengeCheck.status === "COMPLETED") {
+      return NextResponse.json({ error: "挑战赛已关闭，无法提交" }, { status: 400 });
+    }
+
     const participation = await prisma.challengeParticipation.update({
       where: { userId_challengeId: { userId, challengeId: data.challengeId } },
       data: {

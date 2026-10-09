@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
+import { useToast } from "@/components/Toast";
 
 const typeLabels: Record<string, string> = {
   COURSE: "课程作业",
@@ -30,11 +31,25 @@ const ABILITY_LABELS: Record<string, string> = {
   express: "表达力",
 };
 
+interface StoredReport {
+  id: string;
+  weekStart: string;
+  weekEnd: string;
+  recordCount: number;
+  abilityChanges: string;
+  aiSuggestion: string | null;
+  generatedAt: string;
+}
+
 export default function WeeklyReviewPage() {
   const { status } = useSession();
   const router = useRouter();
+  const { addToast } = useToast();
   const [review, setReview] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState<StoredReport[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -42,16 +57,39 @@ export default function WeeklyReviewPage() {
       return;
     }
     if (status === "authenticated") {
-      fetch("/api/weekly-review")
-        .then((r) => {
-          if (!r.ok) throw new Error("加载失败");
-          return r.json();
+      Promise.all([
+        fetch("/api/weekly-review").then((r) => r.ok ? r.json() : null),
+        fetch("/api/weekly-report").then((r) => r.ok ? r.json() : { reports: [] }),
+      ])
+        .then(([reviewData, historyData]) => {
+          setReview(reviewData);
+          setHistory(historyData.reports || []);
         })
-        .then(setReview)
         .catch(console.error)
         .finally(() => setLoading(false));
     }
   }, [status, router]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/weekly-report", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        addToast("本周报告已保存到历史", "success");
+        // Refresh history
+        const freshRes = await fetch("/api/weekly-report");
+        const fresh = await freshRes.json();
+        setHistory(fresh.reports || []);
+      } else {
+        addToast(data.error || "保存失败", "error");
+      }
+    } catch {
+      addToast("保存失败", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -221,14 +259,93 @@ export default function WeeklyReviewPage() {
         {/* CTA */}
         <div className="bg-[#421d24] rounded-2xl p-8 text-center">
           <p className="text-white/60 text-sm mb-4">持续记录，让能力数据说话</p>
-          <Link
-            href="/projects/new"
-            className="inline-block bg-white text-[#421d24] px-8 py-3 rounded-2xl hover:bg-[#f2f0eb] transition"
-            style={{ fontWeight: 540 }}
-          >
-            继续记录项目 →
-          </Link>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-block bg-[#d4c7ff] text-[#421d24] px-6 py-3 rounded-2xl hover:bg-[#c4b5fe] transition disabled:opacity-50"
+              style={{ fontWeight: 540 }}
+            >
+              {saving ? "保存中..." : "💾 保存本周报告"}
+            </button>
+            <Link
+              href="/projects/new"
+              className="inline-block bg-white text-[#421d24] px-6 py-3 rounded-2xl hover:bg-[#f2f0eb] transition"
+              style={{ fontWeight: 540 }}
+            >
+              继续记录项目 →
+            </Link>
+          </div>
         </div>
+
+        {/* History Section */}
+        {history.length > 0 && (
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-8">
+            <h2 className="text-[#292827] mb-6 flex items-center gap-2" style={{ fontSize: 22, fontWeight: 460 }}>
+              <span className="w-8 h-8 bg-[#d4c7ff]/30 rounded-lg flex items-center justify-center text-sm">📚</span>
+              历史周报
+            </h2>
+            <div className="space-y-3">
+              {history.map((report) => {
+                const start = new Date(report.weekStart);
+                const end = new Date(report.weekEnd);
+                const label = `${start.getMonth() + 1}月${start.getDate()}日 — ${end.getMonth() + 1}月${end.getDate()}日`;
+                const changes = JSON.parse(report.abilityChanges || "{}") as Record<string, number>;
+                const isExpanded = expandedId === report.id;
+
+                return (
+                  <div key={report.id} className="border border-[#e3e3e2] rounded-xl overflow-hidden">
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : report.id)}
+                      className="w-full flex items-center justify-between p-4 bg-[#f2f0eb] hover:bg-white transition text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>{label}</span>
+                        <span className="text-xs text-[#666666] bg-white px-2 py-0.5 rounded-full border border-[#e3e3e2]">
+                          {report.recordCount} 条记录
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {changes.totalScore != null && (
+                          <span className={`text-xs ${changes.totalScore > 0 ? "text-[#714cb6]" : "text-[#666666]"}`} style={{ fontWeight: 540 }}>
+                            {changes.totalScore > 0 ? `+${Math.round(changes.totalScore)}` : Math.round(changes.totalScore || 0)}
+                          </span>
+                        )}
+                        <svg className={`w-4 h-4 text-[#666666] transition-transform ${isExpanded ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div className="p-4 border-t border-[#e3e3e2] space-y-3 animate-slide-up">
+                        {/* Ability mini grid */}
+                        <div className="grid grid-cols-3 gap-2">
+                          {Object.entries(ABILITY_LABELS).map(([key, label]) => (
+                            <div key={key} className="text-center p-2 bg-[#f2f0eb] rounded-lg">
+                              <p className="text-xs text-[#666666]">{label}</p>
+                              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>
+                                {Math.round(changes[key] || 0)}
+                                {(changes[key] || 0) > 0 && <span className="text-[#714cb6] text-xs ml-1">↑</span>}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        {/* AI suggestion */}
+                        {report.aiSuggestion && (
+                          <div className="p-3 bg-[#d4c7ff]/10 rounded-xl border border-[#d4c7ff]/30">
+                            <p className="text-xs text-[#714cb6] mb-1" style={{ fontWeight: 540 }}>AI 建议</p>
+                            <p className="text-sm text-[#292827] whitespace-pre-line leading-relaxed">{report.aiSuggestion}</p>
+                          </div>
+                        )}
+                        <p className="text-xs text-[#666666] text-right">
+                          生成于 {new Date(report.generatedAt).toLocaleDateString("zh-CN")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
