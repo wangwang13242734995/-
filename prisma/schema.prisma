@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  password       String
+  role           String   @default("STUDENT")
+  avatar         String?
+  school         String?
+  major          String?
+  graduationYear Int?
+  bio            String?
+  skills         String   @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  projects       Project[]
+  abilityScores  AbilityScore[]
+  growthRecords  GrowthRecord[]
+  weeklyReports  WeeklyReport[]
+  timeCapsules   TimeCapsule[]
+  enterprise     Enterprise?
+  participations ChallengeParticipation[]
+  credentials    Credential[]
+}
+
+model Project {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                 String
+  type                  String
+  role                  String
+  teamSize              Int       @default(1)
+  startDate             DateTime
+  endDate               DateTime?
+  techStack             String    @default("[]")
+  description           String
+  difficulty            String?
+  outcome               String?
+  outcomeType           String    @default("NONE")
+  outcomeData           String?
+  difficultyEncountered String?
+  solution              String?
+  githubLink            String?
+  designLink            String?
+  videoLink             String?
+  liveLink              String?
+  attachments           String    @default("[]")
+  status                String    @default("DRAFT")
+  credibilityScore      Int       @default(0)
+  problemAnalysis       String    @default("{}")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  growthRecords GrowthRecord[]
+
+  @@index([userId])
+}
+
+model AbilityScore {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  craft        Float    @default(30)
+  learn        Float    @default(30)
+  drive        Float    @default(30)
+  team         Float    @default(30)
+  grit         Float    @default(30)
+  express      Float    @default(30)
+  totalScore   Float    @default(30)
+  calculatedAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model GrowthRecord {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId      String?
+  project        Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  type           String
+  title          String
+  content        String
+  abilitySignals String   @default("[]")
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+model WeeklyReport {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStart      DateTime
+  weekEnd        DateTime
+  recordCount    Int      @default(0)
+  abilityChanges String   @default("{}")
+  hoursInvested  Float    @default(0)
+  aiSuggestion   String?
+  generatedAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model TimeCapsule {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal      String
+  writtenAt DateTime @default(now())
+  openDates String   @default("[]")
+  openedAt  DateTime?
+
+  @@index([userId])
+}
+
+model Enterprise {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName  String
+  logo         String?
+  industry     String?
+  description  String?
+  website      String?
+  status       String   @default("PENDING")
+  rejectReason String?
+  verifiedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  challenges Challenge[]
+}
+
+model Challenge {
+  id              String   @id @default(cuid())
+  enterpriseId    String
+  enterprise      Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  title           String
+  description     String
+  category        String
+  requirements    String?
+  maxParticipants Int      @default(100)
+  duration        Int      @default(14)
+  startDate       DateTime
+  endDate         DateTime
+  status          String   @default("DRAFT")
+  rewardType      String   @default("CERTIFICATE")
+  rewardDetail    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  participations ChallengeParticipation[]
+
+  @@index([enterpriseId])
+  @@index([status])
+}
+
+model ChallengeParticipation {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  submission  String?
+  links       String   @default("[]")
+  status      String   @default("IN_PROGRESS")
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+  feedback    String?
+  rank        Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, challengeId])
+  @@index([challengeId])
+}
+
+model Credential {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  issuer      String
+  description String?
+  verifyCode  String   @unique
+  verifyUrl   String?
+  issuedAt    DateTime @default(now())
+
+  @@index([userId])
+}
