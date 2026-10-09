@@ -19,9 +19,9 @@ interface EnterpriseInfo {
 }
 
 const STATUS_LABELS: Record<string, { text: string; color: string }> = {
-  PENDING: { text: "审核中", color: "bg-amber-50 text-amber-600" },
-  APPROVED: { text: "已通过", color: "bg-green-50 text-green-600" },
-  REJECTED: { text: "已拒绝", color: "bg-red-50 text-red-600" },
+  PENDING: { text: "审核中", color: "bg-[#d4c7ff]/30 text-[#714cb6]" },
+  APPROVED: { text: "已通过", color: "bg-[#0c4243]/10 text-[#0c4243]" },
+  REJECTED: { text: "已拒绝", color: "bg-[#421d24]/10 text-[#421d24]" },
 };
 
 export default function EnterpriseDashboardPage() {
@@ -38,29 +38,29 @@ export default function EnterpriseDashboardPage() {
       .catch(() => setLoading(false));
   }, [authStatus, router]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-slate-400">加载中...</div>;
+  if (loading) return <div className="min-h-screen bg-[#f2f0eb] flex items-center justify-center text-[#666666]">加载中...</div>;
 
   if (!enterprise) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb]">
         <div className="text-center">
           <div className="text-5xl mb-4">🏢</div>
-          <h2 className="text-xl font-semibold text-slate-700 mb-2">你还未认证企业</h2>
-          <p className="text-slate-500 mb-4">完成企业认证后即可发布挑战赛</p>
+          <h2 className="text-xl text-[#292827] mb-2" style={{ fontWeight: 460 }}>你还未认证企业</h2>
+          <p className="text-[#666666] mb-4">完成企业认证后即可发布挑战赛</p>
           <Link href="/enterprise/register" className="btn-primary">去认证</Link>
         </div>
       </div>
     );
   }
 
-  const statusInfo = STATUS_LABELS[enterprise.status] || { text: enterprise.status, color: "bg-slate-100" };
+  const statusInfo = STATUS_LABELS[enterprise.status] || { text: enterprise.status, color: "bg-[#e3e3e2] text-[#666666]" };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
+    <div className="min-h-screen bg-[#f2f0eb]">
+      <header className="bg-white/80 backdrop-blur-[12px] border-b border-[#e3e3e2] px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-slate-900">{enterprise.companyName}</h1>
+            <h1 className="text-[#292827]" style={{ fontSize: 20, fontWeight: 460 }}>{enterprise.companyName}</h1>
             <span className={`text-xs px-2 py-0.5 rounded-full ${statusInfo.color}`}>{statusInfo.text}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -77,26 +77,26 @@ export default function EnterpriseDashboardPage() {
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
         {enterprise.status === "PENDING" && (
-          <div className="card bg-amber-50 border-amber-200">
-            <p className="text-amber-700">你的企业认证正在审核中，审核通过后即可发布挑战赛。</p>
+          <div className="bg-white border border-[#d4c7ff] rounded-2xl p-4">
+            <p className="text-[#714cb6]">你的企业认证正在审核中，审核通过后即可发布挑战赛。</p>
           </div>
         )}
 
         {enterprise.status === "REJECTED" && (
-          <div className="card bg-red-50 border-red-200">
-            <p className="text-red-700">企业认证未通过，请核实企业信息后重新提交。</p>
+          <div className="bg-white border border-[#421d24]/20 rounded-2xl p-4">
+            <p className="text-[#421d24]">企业认证未通过，请核实企业信息后重新提交。</p>
           </div>
         )}
 
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">我的挑战赛</h2>
-          <span className="text-sm text-slate-400">{enterprise.challenges.length} 个</span>
+          <h2 className="text-[#292827]" style={{ fontSize: 18, fontWeight: 460 }}>我的挑战赛</h2>
+          <span className="text-sm text-[#666666]">{enterprise.challenges.length} 个</span>
         </div>
 
         {enterprise.challenges.length === 0 ? (
-          <div className="card text-center py-12">
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 text-center py-12">
             <div className="text-4xl mb-3">🏆</div>
-            <p className="text-slate-500 mb-4">还没有发布挑战赛</p>
+            <p className="text-[#666666] mb-4">还没有发布挑战赛</p>
             {enterprise.status === "APPROVED" && (
               <Link href="/enterprise/challenges/new" className="btn-primary">发布第一个挑战赛</Link>
             )}
@@ -104,17 +104,17 @@ export default function EnterpriseDashboardPage() {
         ) : (
           <div className="space-y-3">
             {enterprise.challenges.map((c) => (
-              <div key={c.id} className="card flex items-center justify-between">
+              <div key={c.id} className="bg-white border border-[#e3e3e2] rounded-2xl p-5 flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-slate-900">{c.title}</h3>
-                  <p className="text-sm text-slate-400 mt-1">
+                  <h3 className="text-[#292827]" style={{ fontWeight: 540 }}>{c.title}</h3>
+                  <p className="text-sm text-[#666666] mt-1">
                     {new Date(c.startDate).toLocaleDateString()} - {new Date(c.endDate).toLocaleDateString()}
                   </p>
                 </div>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  c.status === "OPEN" ? "bg-green-50 text-green-600" :
-                  c.status === "DRAFT" ? "bg-slate-100 text-slate-500" :
-                  "bg-indigo-50 text-indigo-600"
+                  c.status === "OPEN" ? "bg-[#0c4243]/10 text-[#0c4243]" :
+                  c.status === "DRAFT" ? "bg-[#e3e3e2] text-[#666666]" :
+                  "bg-[#d4c7ff]/30 text-[#714cb6]" 
                 }`}>
                   {c.status}
                 </span>

@@ -62,12 +62,12 @@ export default function TalentSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
+    <div className="min-h-screen bg-[#f2f0eb]">
+      <header className="bg-white/80 backdrop-blur-[12px] border-b border-[#e3e3e2] px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">人才搜索</h1>
-            <p className="text-sm text-slate-500 mt-1">按能力维度发现优秀人才</p>
+            <h1 className="text-[#292827]" style={{ fontSize: 20, fontWeight: 460 }}>人才搜索</h1>
+            <p className="text-sm text-[#666666] mt-1">按能力维度发现优秀人才</p>
           </div>
           <div className="flex items-center gap-3">
             {compareIds.length >= 2 && (
@@ -81,21 +81,21 @@ export default function TalentSearchPage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="card mb-6">
+        <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 mb-6">
           <div className="grid md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-slate-500 mb-1">技能方向</label>
+              <label className="block text-xs text-[#666666] mb-1">技能方向</label>
               <input type="text" value={category} onChange={(e) => setCategory(e.target.value)}
                 className="input-field" placeholder="如：React、Python、设计" />
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">排序维度</label>
+              <label className="block text-xs text-[#666666] mb-1">排序维度</label>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="input-field">
                 {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs text-slate-500 mb-1">最低综合分</label>
+              <label className="block text-xs text-[#666666] mb-1">最低综合分</label>
               <input type="number" value={minScore} onChange={(e) => setMinScore(e.target.value)}
                 className="input-field" min="0" max="100" />
             </div>
@@ -103,35 +103,35 @@ export default function TalentSearchPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-slate-400">搜索中...</div>
+          <div className="text-center py-20 text-[#666666]">搜索中...</div>
         ) : students.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🔍</div>
-            <h2 className="text-xl font-semibold text-slate-700 mb-2">暂无匹配人才</h2>
-            <p className="text-slate-500">尝试调整筛选条件</p>
+            <h2 className="text-xl text-[#292827] mb-2" style={{ fontWeight: 460 }}>暂无匹配人才</h2>
+            <p className="text-[#666666]">尝试调整筛选条件</p>
           </div>
         ) : (
           <div className="space-y-3">
             {students.map((s) => (
-              <div key={s.id} className="card">
+              <div key={s.id} className="bg-white border border-[#e3e3e2] rounded-2xl p-5">
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <Link href={`/profile/${s.id}`} className="font-semibold text-slate-900 hover:text-indigo-600">
+                      <Link href={`/profile/${s.id}`} className="text-[#292827] hover:text-[#714cb6]" style={{ fontWeight: 540 }}>
                         {s.name}
                       </Link>
-                      {s.major && <span className="text-xs text-slate-400">{s.major}</span>}
-                      {s.graduationYear && <span className="text-xs text-slate-400">{s.graduationYear} 年入职</span>}
+                      {s.major && <span className="text-xs text-[#666666]">{s.major}</span>}
+                      {s.graduationYear && <span className="text-xs text-[#666666]">{s.graduationYear} 年入职</span>}
                       {s.scores && (
-                        <span className="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full font-medium">
+                        <span className="text-xs px-2 py-0.5 bg-[#d4c7ff]/30 text-[#714cb6] rounded-full" style={{ fontWeight: 540 }}>
                           {Math.round(s.scores.totalScore)} 分
                         </span>
                       )}
                     </div>
-                    {s.bio && <p className="text-sm text-slate-500 mt-1">{s.bio}</p>}
+                    {s.bio && <p className="text-sm text-[#666666] mt-1">{s.bio}</p>}
                     <div className="flex items-center gap-4 mt-2">
-                      <span className="text-xs text-slate-400">{s.projectCount} 个项目</span>
-                      <span className="text-xs text-slate-400">{s.recordCount} 条记录</span>
+                      <span className="text-xs text-[#666666]">{s.projectCount} 个项目</span>
+                      <span className="text-xs text-[#666666]">{s.recordCount} 条记录</span>
                       {s.scores && (
                         <div className="flex gap-2">
                           {[
@@ -142,7 +142,7 @@ export default function TalentSearchPage() {
                             { l: "抗压", v: s.scores.grit },
                             { l: "表达", v: s.scores.express },
                           ].map(({ l, v }) => (
-                            <span key={l} className="text-xs text-slate-400">{l} <span className="font-medium text-slate-600">{Math.round(v)}</span></span>
+                            <span key={l} className="text-xs text-[#666666]">{l} <span className="text-[#292827]" style={{ fontWeight: 540 }}>{Math.round(v)}</span></span>
                           ))}
                         </div>
                       )}
@@ -150,7 +150,7 @@ export default function TalentSearchPage() {
                     {s.topProjects.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {s.topProjects.slice(0, 3).map((p) => (
-                          <span key={p.id} className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">{p.title}</span>
+                          <span key={p.id} className="text-xs px-2 py-0.5 bg-[#f2f0eb] text-[#666666] rounded-full border border-[#e3e3e2]">{p.title}</span>
                         ))}
                       </div>
                     )}
@@ -160,13 +160,13 @@ export default function TalentSearchPage() {
                       onClick={() => toggleCompare(s.id)}
                       className={`text-xs px-3 py-1 rounded-full transition-colors ${
                         compareIds.includes(s.id)
-                          ? "bg-indigo-600 text-white"
-                          : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                          ? "bg-[#421d24] text-white"
+                          : "bg-[#f2f0eb] text-[#666666] hover:bg-[#e3e3e2] border border-[#e3e3e2]"
                       }`}
                     >
                       {compareIds.includes(s.id) ? "已选" : "加入对比"}
                     </button>
-                    <Link href={`/profile/${s.id}`} className="text-xs text-indigo-600 hover:underline">查看详情</Link>
+                    <Link href={`/profile/${s.id}`} className="text-xs text-[#714cb6] hover:underline">查看详情</Link>
                   </div>
                 </div>
               </div>

@@ -7,6 +7,8 @@ import Link from "next/link";
 import { AbilityRadar } from "@/components/AbilityRadar";
 import GrowthTrend from "@/components/GrowthTrend";
 import AchievementPanel from "@/components/AchievementPanel";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 interface DashboardData {
   latestScore: {
@@ -40,8 +42,8 @@ export default function DashboardPage() {
 
   if (loading || status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-slate-400">加载中...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb]">
+        <div className="text-[#666666]">加载中...</div>
       </div>
     );
   }
@@ -58,72 +60,74 @@ export default function DashboardPage() {
   if (suggestions.length === 0) suggestions.push("你的能力画像已经比较完整，继续保持记录频率！");
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen flex flex-col bg-[#f2f0eb]">
+      <Header />
+
+      <main className="flex-1 max-w-[1200px] mx-auto w-full px-6 py-10 space-y-6">
+        {/* Greeting */}
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
+            <h1 className="text-[#292827]" style={{ fontSize: 26, fontWeight: 460, lineHeight: 1.3 }}>
               你好，{session?.user?.name || "同学"}
             </h1>
-            <p className="text-sm text-slate-500 mt-1">这是你的成长概览</p>
+            <p className="text-sm text-[#666666] mt-1">这是你的成长概览</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/projects" className="btn-secondary text-sm">我的项目</Link>
-            <Link href="/projects/new" className="btn-primary text-sm">+ 记录新项目</Link>
+            <Link href="/projects" className="btn-secondary">我的项目</Link>
+            <Link href="/projects/new" className="btn-primary text-sm !py-2 !px-4">+ 记录新项目</Link>
           </div>
         </div>
-      </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8 space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-4 gap-4">
           {[
-            { label: "完成项目", value: stats.projectCount, color: "text-blue-600" },
-            { label: "成长记录", value: stats.recordCount, color: "text-green-600" },
-            { label: "记录天数", value: stats.uniqueDays, color: "text-purple-600" },
-            { label: "连续天数", value: stats.streakDays, color: "text-amber-600" },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="card text-center">
-              <div className={`text-3xl font-bold ${color}`}>{value}</div>
-              <div className="text-sm text-slate-500 mt-1">{label}</div>
+            { label: "完成项目", value: stats.projectCount },
+            { label: "成长记录", value: stats.recordCount },
+            { label: "记录天数", value: stats.uniqueDays },
+            { label: "连续天数", value: stats.streakDays },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-white border border-[#e3e3e2] rounded-2xl p-5 text-center">
+              <div className="text-3xl text-[#421d24]" style={{ fontWeight: 540 }}>{value}</div>
+              <div className="text-sm text-[#666666] mt-1">{label}</div>
             </div>
           ))}
         </div>
 
-        {/* Weekly Review Quick Access */}
+        {/* Weekly Review + Challenge Quick Access */}
         <div className="grid md:grid-cols-2 gap-4">
           <Link
             href="/weekly-review"
-            className="group bg-gradient-to-br from-emerald-50 to-white p-5 rounded-xl border border-emerald-100 hover:border-emerald-200 hover:shadow-md transition-all"
+            className="group bg-white border border-[#e3e3e2] rounded-2xl p-5 hover:border-[#714cb6] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 bg-emerald-100 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📊</div>
+              <div className="w-11 h-11 bg-[#d4c7ff] rounded-2xl flex items-center justify-center text-xl group-hover:scale-105 transition-transform">📊</div>
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">本周复盘</h3>
-                <p className="text-xs text-slate-500 mt-0.5">看看这周你的能力变化</p>
+                <h3 className="text-[#292827]" style={{ fontWeight: 540 }}>本周复盘</h3>
+                <p className="text-xs text-[#666666] mt-0.5">看看这周你的能力变化</p>
               </div>
-              <span className="text-emerald-600 text-sm font-medium group-hover:translate-x-1 transition-transform">查看 →</span>
+              <span className="text-[#714cb6] text-sm group-hover:translate-x-1 transition-transform" style={{ fontWeight: 460 }}>查看 →</span>
             </div>
           </Link>
           <Link
             href="/challenges"
-            className="group bg-gradient-to-br from-amber-50 to-white p-5 rounded-xl border border-amber-100 hover:border-amber-200 hover:shadow-md transition-all"
+            className="group bg-[#0c4243] rounded-2xl p-5 hover:opacity-90 transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">⚔️</div>
+              <div className="w-11 h-11 bg-white/15 rounded-2xl flex items-center justify-center text-xl group-hover:scale-105 transition-transform">⚔️</div>
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">挑战广场</h3>
-                <p className="text-xs text-slate-500 mt-0.5">企业真实任务，用能力解答</p>
+                <h3 className="text-white" style={{ fontWeight: 540 }}>挑战广场</h3>
+                <p className="text-xs text-white/60 mt-0.5">企业真实任务，用能力解答</p>
               </div>
-              <span className="text-amber-600 text-sm font-medium group-hover:translate-x-1 transition-transform">探索 →</span>
+              <span className="text-white/80 text-sm group-hover:translate-x-1 transition-transform" style={{ fontWeight: 460 }}>探索 →</span>
             </div>
           </Link>
         </div>
 
+        {/* Radar + Suggestions Grid */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Radar Chart */}
-          <div className="card flex flex-col items-center">
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">能力快照</h2>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 flex flex-col items-center">
+            <h2 className="text-[#292827] mb-2 self-start" style={{ fontSize: 19, fontWeight: 460 }}>能力快照</h2>
             <AbilityRadar
               data={{
                 craft: scores.craft,
@@ -137,7 +141,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2 mt-2">
               <Link
                 href={`/profile/${(session?.user as { id: string })?.id}`}
-                className="text-sm text-indigo-600 hover:underline"
+                className="link-violet text-sm"
               >
                 查看完整能力名片 &rarr;
               </Link>
@@ -145,19 +149,19 @@ export default function DashboardPage() {
           </div>
 
           {/* AI Suggestions */}
-          <div className="card">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">成长建议</h2>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
+            <h2 className="text-[#292827] mb-4" style={{ fontSize: 19, fontWeight: 460 }}>成长建议</h2>
             <div className="space-y-3">
               {suggestions.slice(0, 3).map((s, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg">
-                  <span className="text-indigo-500 mt-0.5">💡</span>
-                  <p className="text-sm text-slate-700">{s}</p>
+                <div key={i} className="flex items-start gap-3 p-3 bg-[#f2f0eb] rounded-xl">
+                  <span className="text-[#714cb6] mt-0.5">💡</span>
+                  <p className="text-sm text-[#292827] leading-relaxed">{s}</p>
                 </div>
               ))}
             </div>
 
             <div className="mt-6">
-              <h3 className="text-sm font-medium text-slate-700 mb-3">能力维度</h3>
+              <h3 className="text-sm text-[#292827] mb-3" style={{ fontWeight: 540 }}>能力维度</h3>
               <div className="space-y-2">
                 {[
                   { label: "专业力", value: scores.craft, desc: "技术深度与成果质量" },
@@ -168,14 +172,14 @@ export default function DashboardPage() {
                   { label: "表达力", value: scores.express, desc: "叙事清晰度与结构化" },
                 ].map(({ label, value, desc }) => (
                   <div key={label} className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 w-14">{label}</span>
-                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <span className="text-xs text-[#666666] w-14">{label}</span>
+                    <div className="flex-1 h-2 bg-[#e3e3e2] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-indigo-500 rounded-full transition-all"
+                        className="h-full bg-[#714cb6] rounded-full transition-all"
                         style={{ width: `${value}%` }}
                       />
                     </div>
-                    <span className="text-xs text-slate-600 w-6 text-right">{value}</span>
+                    <span className="text-xs text-[#292827] w-6 text-right">{value}</span>
                   </div>
                 ))}
               </div>
@@ -206,16 +210,16 @@ export default function DashboardPage() {
 
         {/* Recent Records */}
         {data?.growthRecords && data.growthRecords.length > 0 && (
-          <div className="card">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">最近记录</h2>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
+            <h2 className="text-[#292827] mb-4" style={{ fontSize: 19, fontWeight: 460 }}>最近记录</h2>
             <div className="space-y-3">
               {data.growthRecords.slice(0, 5).map((record) => (
-                <div key={record.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                  <div className="w-2 h-2 bg-indigo-400 rounded-full mt-2" />
+                <div key={record.id} className="flex items-start gap-3 p-3 bg-[#f2f0eb] rounded-xl">
+                  <div className="w-2 h-2 bg-[#714cb6] rounded-full mt-2" />
                   <div>
-                    <p className="text-sm font-medium text-slate-900">{record.title}</p>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-1">{record.content}</p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>{record.title}</p>
+                    <p className="text-xs text-[#666666] mt-1 line-clamp-1">{record.content}</p>
+                    <p className="text-xs text-[#666666] opacity-60 mt-1">
                       {new Date(record.date).toLocaleDateString("zh-CN")}
                     </p>
                   </div>
@@ -226,28 +230,30 @@ export default function DashboardPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="card">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">快速操作</h2>
+        <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
+          <h2 className="text-[#292827] mb-4" style={{ fontSize: 19, fontWeight: 460 }}>快速操作</h2>
           <div className="grid grid-cols-4 gap-4">
-            <Link href="/projects/new" className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
+            <Link href="/projects/new" className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
               <div className="text-2xl mb-2">📝</div>
-              <p className="text-sm font-medium text-slate-900">记录新项目</p>
+              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>记录新项目</p>
             </Link>
-            <Link href="/challenges" className="p-4 bg-red-50 rounded-lg text-center hover:bg-red-100 transition-colors">
+            <Link href="/challenges" className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
               <div className="text-2xl mb-2">🏆</div>
-              <p className="text-sm font-medium text-slate-900">发现挑战赛</p>
+              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>发现挑战赛</p>
             </Link>
-            <Link href={`/profile/${(session?.user as { id: string })?.id}`} className="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100 transition-colors">
+            <Link href={`/profile/${(session?.user as { id: string })?.id}`} className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
               <div className="text-2xl mb-2">🎯</div>
-              <p className="text-sm font-medium text-slate-900">查看能力名片</p>
+              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>查看能力名片</p>
             </Link>
-            <Link href="/projects" className="p-4 bg-amber-50 rounded-lg text-center hover:bg-amber-100 transition-colors">
+            <Link href="/projects" className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
               <div className="text-2xl mb-2">📋</div>
-              <p className="text-sm font-medium text-slate-900">管理项目</p>
+              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>管理项目</p>
             </Link>
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

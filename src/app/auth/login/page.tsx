@@ -38,22 +38,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb] px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">履程</h1>
-          <p className="text-slate-500 mt-2">登录你的成长档案</p>
+          <h1 className="text-[#292827]" style={{ fontSize: 30, fontWeight: 460 }}>履程</h1>
+          <p className="text-[#666666] mt-2">登录你的成长档案</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+            <div className="p-3 bg-[#421d24]/10 border border-[#421d24]/20 text-[#421d24] rounded-xl text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               邮箱
             </label>
             <input
@@ -67,7 +67,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               密码
             </label>
             <input
@@ -84,9 +84,9 @@ export default function LoginPage() {
             {loading ? "登录中..." : "登录"}
           </button>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-[#666666]">
             还没有账号？{" "}
-            <Link href="/auth/register" className="text-indigo-600 hover:underline">
+            <Link href="/auth/register" className="text-[#714cb6] hover:underline">
               立即注册
             </Link>
           </p>

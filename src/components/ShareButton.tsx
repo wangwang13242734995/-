@@ -27,11 +27,12 @@ export default function ShareButton({ userId }: { userId: string }) {
   return (
     <button
       onClick={handleShare}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all border ${
         copied
-          ? "bg-green-100 text-green-700"
-          : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+          ? "bg-[#0c4243]/10 text-[#0c4243] border-[#0c4243]/20"
+          : "bg-[#d4c7ff]/30 text-[#714cb6] border-[#d4c7ff] hover:bg-[#d4c7ff]/50"
       }`}
+      style={{ fontWeight: 540 }}
     >
       {copied ? (
         <>

@@ -12,36 +12,36 @@ export default function AchievementPanel({ scores, projectCount, streakDays }: A
   const stats = getAchievementStats(scores, projectCount, streakDays);
 
   return (
-    <div className="card">
+    <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-          <span className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600">🏅</span>
+        <h2 className="text-[#292827] flex items-center gap-2" style={{ fontSize: 18, fontWeight: 460 }}>
+          <span className="w-8 h-8 bg-[#d4c7ff]/30 rounded-lg flex items-center justify-center text-sm">🏅</span>
           成就
         </h2>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500">{stats.unlocked}/{stats.total}</span>
-          <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+          <span className="text-sm text-[#666666]">{stats.unlocked}/{stats.total}</span>
+          <div className="w-24 h-2 bg-[#e3e3e2] rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all"
+              className="h-full bg-[#714cb6] rounded-full transition-all"
               style={{ width: `${stats.percentage}%` }}
             />
           </div>
-          <span className="text-xs text-amber-600 font-medium">{stats.percentage}%</span>
+          <span className="text-xs text-[#714cb6]" style={{ fontWeight: 540 }}>{stats.percentage}%</span>
         </div>
       </div>
 
       {/* Recent Achievements */}
       {stats.recent.length > 0 && (
         <div className="mb-4">
-          <p className="text-xs text-slate-400 mb-2">最近解锁</p>
+          <p className="text-xs text-[#666666] mb-2">最近解锁</p>
           <div className="flex gap-2">
             {stats.recent.map((ach) => (
               <div
                 key={ach.id}
-                className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-100 rounded-lg"
+                className="flex items-center gap-2 px-3 py-2 bg-[#d4c7ff]/20 border border-[#d4c7ff] rounded-xl"
               >
                 <span className="text-lg">{ach.icon}</span>
-                <span className="text-xs font-medium text-amber-800">{ach.title}</span>
+                <span className="text-xs text-[#714cb6]" style={{ fontWeight: 540 }}>{ach.title}</span>
               </div>
             ))}
           </div>
@@ -69,15 +69,15 @@ function AchievementBadge({ achievement }: { achievement: Achievement }) {
     <div
       className={`flex flex-col items-center p-3 rounded-xl border transition ${
         achievement.achieved
-          ? "bg-gradient-to-b from-amber-50 to-white border-amber-200 shadow-sm"
-          : "bg-slate-50 border-slate-100 opacity-50"
+          ? "bg-[#d4c7ff]/20 border-[#d4c7ff]"
+          : "bg-[#f2f0eb] border-[#e3e3e2] opacity-50"
       }`}
       title={achievement.description}
     >
       <span className="text-2xl mb-1">{achievement.icon}</span>
-      <span className={`text-[10px] text-center leading-tight font-medium ${
-        achievement.achieved ? "text-amber-800" : "text-slate-400"
-      }`}>
+      <span className={`text-[10px] text-center leading-tight ${
+        achievement.achieved ? "text-[#714cb6]" : "text-[#666666]"
+      }`} style={{ fontWeight: 540 }}>
         {achievement.title}
       </span>
     </div>

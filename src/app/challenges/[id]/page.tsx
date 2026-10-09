@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Header } from "@/components/Header";
 
 interface ChallengeDetail {
   id: string;
@@ -88,65 +89,62 @@ export default function ChallengeDetailPage() {
     if (linkInput.trim()) { setLinks([...links, linkInput.trim()]); setLinkInput(""); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-slate-400">加载中...</div>;
-  if (!challenge) return <div className="min-h-screen flex items-center justify-center text-slate-400">挑战赛不存在</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb] text-[#666666]">加载中...</div>;
+  if (!challenge) return <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb] text-[#666666]">挑战赛不存在</div>;
 
   const daysLeft = Math.max(0, Math.ceil((new Date(challenge.endDate).getTime() - Date.now()) / 86400000));
   const isParticipating = !!challenge.myParticipation;
   const hasSubmitted = challenge.myParticipation?.status === "SUBMITTED";
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="max-w-3xl mx-auto">
-          <Link href="/challenges" className="text-sm text-slate-500 hover:text-slate-700">&larr; 返回挑战赛列表</Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f2f0eb] flex flex-col">
+      <Header />
 
-      <main className="max-w-3xl mx-auto px-6 py-8 space-y-6">
-        <div className="card">
+      <main className="flex-1 max-w-[800px] mx-auto w-full px-6 py-10 space-y-6">
+        <Link href="/challenges" className="link-violet text-sm">&larr; 返回挑战赛列表</Link>
+        <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-lg font-bold text-indigo-600">
+            <div className="w-12 h-12 bg-[#d4c7ff] rounded-2xl flex items-center justify-center text-lg text-[#421d24]" style={{ fontWeight: 540 }}>
               {challenge.enterprise.companyName.charAt(0)}
             </div>
             <div>
-              <p className="font-medium text-slate-900">{challenge.enterprise.companyName}</p>
-              <p className="text-xs text-slate-400">{challenge.enterprise.industry}</p>
+              <p className="text-[#292827]" style={{ fontWeight: 540 }}>{challenge.enterprise.companyName}</p>
+              <p className="text-xs text-[#666666]">{challenge.enterprise.industry}</p>
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-slate-900 mb-3">{challenge.title}</h1>
+          <h1 className="text-[#292827] mb-3" style={{ fontSize: 28, fontWeight: 460, lineHeight: 1.14, letterSpacing: "-0.022em" }}>{challenge.title}</h1>
 
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full">{challenge.category}</span>
-            <span className="text-xs px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full">{REWARD_LABELS[challenge.rewardType]}</span>
-            <span className="text-xs text-slate-400">{challenge._count.participations}/{challenge.maxParticipants} 人参与</span>
-            <span className={`text-xs font-medium ${daysLeft <= 3 ? "text-red-500" : "text-slate-500"}`}>
+            <span className="text-xs px-2 py-0.5 bg-[#d4c7ff]/30 text-[#714cb6] rounded-full">{challenge.category}</span>
+            <span className="text-xs px-2 py-0.5 bg-[#d4c7ff]/40 text-[#421d24] rounded-full">{REWARD_LABELS[challenge.rewardType]}</span>
+            <span className="text-xs text-[#666666]">{challenge._count.participations}/{challenge.maxParticipants} 人参与</span>
+            <span className={`text-xs ${daysLeft <= 3 ? "text-[#421d24]" : "text-[#666666]"}`} style={{ fontWeight: 540 }}>
               {daysLeft > 0 ? `剩余 ${daysLeft} 天` : "已结束"}
             </span>
           </div>
 
-          <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-line">
+          <div className="prose prose-sm max-w-none text-[#292827] whitespace-pre-line leading-relaxed">
             {challenge.description}
           </div>
         </div>
 
         {challenge.requirements && (
-          <div className="card">
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">参赛要求</h2>
-            <p className="text-sm text-slate-600 whitespace-pre-line">{challenge.requirements}</p>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6">
+            <h2 className="text-[#292827] mb-2" style={{ fontSize: 19, fontWeight: 460 }}>参赛要求</h2>
+            <p className="text-sm text-[#666666] whitespace-pre-line">{challenge.requirements}</p>
           </div>
         )}
 
         {challenge.rewardDetail && (
-          <div className="card bg-amber-50 border-amber-100">
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">奖励详情</h2>
-            <p className="text-sm text-slate-700">{challenge.rewardDetail}</p>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 border-l-4 border-l-[#714cb6]">
+            <h2 className="text-[#292827] mb-2" style={{ fontSize: 19, fontWeight: 460 }}>奖励详情</h2>
+            <p className="text-sm text-[#292827]">{challenge.rewardDetail}</p>
           </div>
         )}
 
         {msg && (
-          <div className={`p-3 rounded-lg text-sm ${msg.includes("失败") || msg.includes("错误") ? "bg-red-50 text-red-600 border border-red-200" : "bg-green-50 text-green-600 border border-green-200"}`}>
+          <div className={`p-4 rounded-xl text-sm ${msg.includes("失败") || msg.includes("错误") ? "bg-[#421d24]/10 text-[#421d24] border border-[#421d24]/20" : "bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20"}`}>
             {msg}
           </div>
         )}
@@ -156,12 +154,12 @@ export default function ChallengeDetailPage() {
             {joining ? "加入中..." : daysLeft > 0 ? "参与挑战赛" : "已结束"}
           </button>
         ) : hasSubmitted ? (
-          <div className="card bg-green-50 border-green-200 text-center">
-            <p className="text-green-700 font-medium">作品已提交，等待企业评审</p>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 border-l-4 border-l-[#0c4243] text-center">
+            <p className="text-[#0c4243]" style={{ fontWeight: 540 }}>作品已提交，等待企业评审</p>
           </div>
         ) : (
-          <div className="card space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">提交作品</h2>
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>提交作品</h2>
             <textarea
               value={submission}
               onChange={(e) => setSubmission(e.target.value)}
@@ -178,7 +176,7 @@ export default function ChallengeDetailPage() {
               {links.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {links.map((l, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded-full text-xs">
+                    <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-[#f2f0eb] rounded-full text-xs border border-[#e3e3e2]">
                       {l}
                       <button onClick={() => setLinks(links.filter((_, j) => j !== i))} className="text-red-400 hover:text-red-600">x</button>
                     </span>

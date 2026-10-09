@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Header } from "@/components/Header";
 
 const PROJECT_TYPES = [
   { value: "COURSE", label: "课程作业" },
@@ -104,26 +105,19 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-slate-900">记录新项目</h1>
-          <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-700">
-            取消
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#f2f0eb] flex flex-col">
+      <Header />
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <main className="flex-1 max-w-[800px] mx-auto w-full px-6 py-10">
         {submitted ? (
-          <div className="card text-center space-y-6">
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 text-center space-y-6">
             <div className="text-6xl">🎉</div>
-            <h2 className="text-2xl font-bold text-slate-900">项目记录成功！</h2>
-            <p className="text-slate-500">你的努力已转化为能力数据</p>
+            <h2 className="text-2xl text-[#292827]" style={{ fontWeight: 460 }}>项目记录成功！</h2>
+            <p className="text-[#666666]">你的努力已转化为能力数据</p>
 
             {abilityChanges && (
-              <div className="bg-slate-50 rounded-xl p-6">
-                <h3 className="text-sm font-medium text-slate-500 mb-4">本次能力变化</h3>
+              <div className="bg-[#f2f0eb] rounded-2xl p-6">
+                <h3 className="text-sm text-[#666666] mb-4" style={{ fontWeight: 540 }}>本次能力变化</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {[
                     { key: "craft", label: "专业力", emoji: "⚙️" },
@@ -138,16 +132,16 @@ export default function NewProjectPage() {
                       <div key={key} className="text-center">
                         <div className="text-xl mb-1">{emoji}</div>
                         <div className="text-xs text-slate-500">{label}</div>
-                        <div className={`text-lg font-bold mt-1 ${change > 0 ? "text-green-600" : change < 0 ? "text-red-500" : "text-slate-400"}`}>
+                        <div className={`text-lg mt-1 ${change > 0 ? "text-[#0c4243]" : change < 0 ? "text-[#421d24]" : "text-[#666666]"}`} style={{ fontWeight: 540 }}>
                           {change > 0 ? `+${change}` : change === 0 ? "0" : change}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-200">
-                  <span className="text-sm text-slate-500">综合分 </span>
-                  <span className={`text-xl font-bold ${abilityChanges.totalScore > 0 ? "text-green-600" : "text-slate-600"}`}>
+                <div className="mt-4 pt-4 border-t border-[#e3e3e2]">
+                  <span className="text-sm text-[#666666]">综合分 </span>
+                  <span className={`text-xl ${abilityChanges.totalScore > 0 ? "text-[#0c4243]" : "text-[#292827]"}`} style={{ fontWeight: 540 }}>
                     {abilityChanges.totalScore > 0 ? `+${abilityChanges.totalScore}` : abilityChanges.totalScore}
                   </span>
                 </div>
@@ -155,25 +149,25 @@ export default function NewProjectPage() {
             )}
 
             {analysis && (
-              <div className="bg-indigo-50 rounded-xl p-6 text-left">
-                <h3 className="text-sm font-medium text-indigo-600 mb-3">🧠 AI 能力洞察</h3>
-                <p className="text-sm text-slate-700 mb-4">{analysis.summary}</p>
+              <div className="bg-[#d4c7ff]/20 rounded-2xl p-6 text-left border border-[#d4c7ff]">
+                <h3 className="text-sm text-[#714cb6] mb-3" style={{ fontWeight: 540 }}>AI 能力洞察</h3>
+                <p className="text-sm text-[#292827] mb-4 leading-relaxed">{analysis.summary}</p>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {analysis.thinking.pattern.map((p) => (
-                    <span key={p} className="text-xs px-2 py-1 bg-white rounded-full text-indigo-600">{p}</span>
+                    <span key={p} className="text-xs px-2 py-1 bg-white rounded-full text-[#714cb6] border border-[#d4c7ff]">{p}</span>
                   ))}
                 </div>
                 {analysis.insights.length > 0 && (
                   <div className="space-y-2 mt-4">
                     {analysis.insights.map((ins, i) => (
                       <div key={i} className="flex items-start gap-2 text-sm">
-                        <span className={`w-2 h-2 rounded-full mt-1.5 ${ins.strength === "high" ? "bg-green-500" : "bg-amber-400"}`}></span>
-                        <span className="text-slate-700">{ins.signal}</span>
+                        <span className={`w-2 h-2 rounded-full mt-1.5 ${ins.strength === "high" ? "bg-[#0c4243]" : "bg-[#d4c7ff]"}`}></span>
+                        <span className="text-[#292827]">{ins.signal}</span>
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="mt-3 text-xs text-slate-500">
+                <div className="mt-3 text-xs text-[#666666]">
                   解决深度: {analysis.depth.score >= 80 ? "专家级 ⭐" : analysis.depth.score >= 55 ? "深度 🔵" : analysis.depth.score >= 35 ? "中等 🟡" : "初步 🟢"}
                   {" · 创新性 "}{analysis.thinking.creativity}/100
                 </div>
@@ -188,17 +182,17 @@ export default function NewProjectPage() {
         ) : (
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+            <div className="p-4 bg-[#421d24]/10 border border-[#421d24]/20 text-[#421d24] rounded-xl">
               {error}
             </div>
           )}
 
           {/* 基本信息 */}
-          <section className="card space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">基本信息</h2>
+          <section className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>基本信息</h2>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">项目名称 *</label>
+              <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>项目名称 *</label>
               <input
                 type="text"
                 value={form.title}
@@ -211,7 +205,7 @@ export default function NewProjectPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">项目类型 *</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>项目类型 *</label>
                 <select
                   value={form.type}
                   onChange={(e) => update("type", e.target.value)}
@@ -223,7 +217,7 @@ export default function NewProjectPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">你的角色 *</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>你的角色 *</label>
                 <input
                   type="text"
                   value={form.role}
@@ -237,7 +231,7 @@ export default function NewProjectPage() {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">团队规模</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>团队规模</label>
                 <input
                   type="number"
                   value={form.teamSize}
@@ -248,7 +242,7 @@ export default function NewProjectPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">开始日期</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>开始日期</label>
                 <input
                   type="date"
                   value={form.startDate}
@@ -257,7 +251,7 @@ export default function NewProjectPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">结束日期</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>结束日期</label>
                 <input
                   type="date"
                   value={form.endDate}
@@ -268,7 +262,7 @@ export default function NewProjectPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">技术栈 / 工具</label>
+              <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>技术栈 / 工具</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -287,7 +281,7 @@ export default function NewProjectPage() {
                   {form.techStack.map((tech) => (
                     <span
                       key={tech}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-[#d4c7ff]/30 text-[#714cb6] rounded-full text-sm border border-[#d4c7ff]"
                     >
                       {tech}
                       <button type="button" onClick={() => removeTech(tech)} className="hover:text-red-500">
@@ -301,9 +295,9 @@ export default function NewProjectPage() {
           </section>
 
           {/* 项目描述 */}
-          <section className="card space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">项目描述 *</h2>
-            <p className="text-sm text-slate-500">至少 50 字，描述越详细，能力评估越准确</p>
+          <section className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>项目描述 *</h2>
+            <p className="text-sm text-[#666666]">至少 50 字，描述越详细，能力评估越准确</p>
             <textarea
               value={form.description}
               onChange={(e) => update("description", e.target.value)}
@@ -312,22 +306,22 @@ export default function NewProjectPage() {
               required
               minLength={50}
             />
-            <p className={`text-xs ${form.description.length >= 50 ? "text-green-500" : "text-slate-400"}`}>
+            <p className={`text-xs ${form.description.length >= 50 ? "text-[#0c4243]" : "text-[#666666]"}`}>
               {form.description.length}/50 字（最少）
             </p>
           </section>
 
           {/* 困难与解决 - 核心差异化 */}
-          <section className="card space-y-4 border-2 border-indigo-100">
+          <section className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4 border-l-4 border-l-[#421d24]">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">遇到的困难与解决方案</h2>
-              <p className="text-sm text-slate-500 mt-1">
+              <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>遇到的困难与解决方案</h2>
+              <p className="text-sm text-[#666666] mt-1">
                 这是企业最看重的部分——展示你如何解决问题比展示成果更有说服力
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
                 遇到的最大困难 *（50-500 字）
               </label>
               <textarea
@@ -338,13 +332,13 @@ export default function NewProjectPage() {
                 minLength={50}
                 maxLength={500}
               />
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#666666] mt-1">
                 {form.difficultyEncountered.length}/500 字（最少 50 字）
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
                 你是怎么解决的 *（50-500 字）
               </label>
               <textarea
@@ -355,18 +349,18 @@ export default function NewProjectPage() {
                 minLength={50}
                 maxLength={500}
               />
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#666666] mt-1">
                 {form.solution.length}/500 字（最少 50 字）
               </p>
             </div>
           </section>
 
           {/* 项目成果 */}
-          <section className="card space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">项目成果</h2>
+          <section className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>项目成果</h2>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">成果类型</label>
+              <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>成果类型</label>
               <select
                 value={form.outcomeType}
                 onChange={(e) => update("outcomeType", e.target.value)}
@@ -380,7 +374,7 @@ export default function NewProjectPage() {
 
             {form.outcomeType !== "NONE" && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">成果描述</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>成果描述</label>
                 <input
                   type="text"
                   value={form.outcome}
@@ -398,25 +392,25 @@ export default function NewProjectPage() {
           </section>
 
           {/* 外链 */}
-          <section className="card space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">项目链接（选填）</h2>
-            <p className="text-sm text-slate-500">添加外链可以提升记录的可信度</p>
+          <section className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>项目链接（选填）</h2>
+            <p className="text-sm text-[#666666]">添加外链可以提升记录的可信度</p>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">GitHub</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>GitHub</label>
                 <input type="url" value={form.githubLink} onChange={(e) => update("githubLink", e.target.value)} className="input-field" placeholder="https://github.com/..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">设计稿</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>设计稿</label>
                 <input type="url" value={form.designLink} onChange={(e) => update("designLink", e.target.value)} className="input-field" placeholder="https://figma.com/..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">视频演示</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>视频演示</label>
                 <input type="url" value={form.videoLink} onChange={(e) => update("videoLink", e.target.value)} className="input-field" placeholder="https://bilibili.com/..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">线上地址</label>
+                <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>线上地址</label>
                 <input type="url" value={form.liveLink} onChange={(e) => update("liveLink", e.target.value)} className="input-field" placeholder="https://..." />
               </div>
             </div>

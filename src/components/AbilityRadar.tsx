@@ -37,18 +37,18 @@ export function AbilityRadar({ data, size = 300 }: { data: AbilityData; size?: n
   return (
     <ResponsiveContainer width={size} height={size}>
       <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-        <PolarGrid stroke="#e2e8f0" />
+        <PolarGrid stroke="#e3e3e2" />
         <PolarAngleAxis
           dataKey="subject"
-          tick={{ fill: "#475569", fontSize: 13 }}
+          tick={{ fill: "#666666", fontSize: 13 }}
         />
         <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
         <Radar
           name="能力值"
           dataKey="value"
-          stroke="#6366f1"
-          fill="#6366f1"
-          fillOpacity={0.2}
+          stroke="#421d24"
+          fill="#714cb6"
+          fillOpacity={0.15}
           strokeWidth={2}
         />
       </RadarChart>

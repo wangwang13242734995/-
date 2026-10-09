@@ -53,22 +53,22 @@ export default function RegisterPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb] px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">加入履程</h1>
-          <p className="text-slate-500 mt-2">开始记录你的每一步成长</p>
+          <h1 className="text-[#292827]" style={{ fontSize: 30, fontWeight: 460 }}>加入履程</h1>
+          <p className="text-[#666666] mt-2">开始记录你的每一步成长</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="card space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+            <div className="p-3 bg-[#421d24]/10 border border-[#421d24]/20 text-[#421d24] rounded-xl text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               昵称 *
             </label>
             <input
@@ -82,7 +82,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               邮箱 *
             </label>
             <input
@@ -96,7 +96,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               密码 *
             </label>
             <input
@@ -110,12 +110,12 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="border-t border-slate-100 pt-4">
-            <p className="text-sm text-slate-500 mb-3">以下信息选填，用于生成能力名片</p>
+          <div className="border-t border-[#e3e3e2] pt-4">
+            <p className="text-sm text-[#666666] mb-3">以下信息选填，用于生成能力名片</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               一句话介绍自己
             </label>
             <textarea
@@ -126,11 +126,11 @@ export default function RegisterPage() {
               rows={2}
               maxLength={100}
             />
-            <p className="text-xs text-slate-400 mt-1">{form.bio.length}/100</p>
+            <p className="text-xs text-[#666666] mt-1">{form.bio.length}/100</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               专业方向
             </label>
             <input
@@ -143,7 +143,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 540 }}>
               预计可入职年份
             </label>
             <select
@@ -164,9 +164,9 @@ export default function RegisterPage() {
             {loading ? "注册中..." : "注册"}
           </button>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-[#666666]">
             已有账号？{" "}
-            <Link href="/auth/login" className="text-indigo-600 hover:underline">
+            <Link href="/auth/login" className="text-[#714cb6] hover:underline">
               立即登录
             </Link>
           </p>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Header } from "@/components/Header";
 
 interface Capsule {
   id: string;
@@ -71,30 +72,28 @@ export default function TimeCapsulePage() {
     } catch { alert("开启失败"); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-slate-400">加载中...</div>;
+  if (loading) return <div className="min-h-screen bg-[#f2f0eb] flex items-center justify-center text-[#666666]">加载中...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-[#f2f0eb] flex flex-col">
+      <Header />
+
+      <main className="flex-1 max-w-[800px] mx-auto w-full px-6 py-10 space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">时光胶囊</h1>
-            <p className="text-sm text-slate-500 mt-1">给未来的自己写一封信</p>
+            <h1 className="text-[#292827]" style={{ fontSize: 26, fontWeight: 460, lineHeight: 1.3 }}>时光胶囊</h1>
+            <p className="text-sm text-[#666666] mt-1">给未来的自己写一封信</p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => setShowForm(!showForm)} className="btn-primary text-sm">
+            <button onClick={() => setShowForm(!showForm)} className="btn-primary text-sm !py-2 !px-4">
               {showForm ? "取消" : "+ 封存新胶囊"}
             </button>
-            <Link href="/dashboard" className="btn-secondary text-sm">仪表盘</Link>
           </div>
         </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-6 py-8 space-y-6">
         {showForm && (
-          <form onSubmit={handleCreate} className="card space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">写下你的目标</h2>
-            {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
+          <form onSubmit={handleCreate} className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 19, fontWeight: 460 }}>写下你的目标</h2>
+            {error && <div className="p-3 bg-[#421d24]/10 border border-[#421d24]/20 text-[#421d24] rounded-xl text-sm">{error}</div>}
 
             <textarea
               value={form.goal}
@@ -106,7 +105,7 @@ export default function TimeCapsulePage() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">设定开启日期</label>
+              <label className="block text-sm text-[#292827] mb-2" style={{ fontWeight: 540 }}>设定开启日期</label>
               {form.dates.map((d, i) => (
                 <div key={i} className="flex gap-2 mb-2">
                   <input type="date" value={d}
@@ -123,7 +122,7 @@ export default function TimeCapsulePage() {
                 </div>
               ))}
               <button type="button" onClick={() => setForm({ ...form, dates: [...form.dates, ""] })}
-                className="text-sm text-indigo-600 hover:underline">+ 添加更多开启日期</button>
+                className="link-violet text-sm">+ 添加更多开启日期</button>
             </div>
 
             <button type="submit" disabled={submitting} className="btn-primary w-full">
@@ -133,11 +132,11 @@ export default function TimeCapsulePage() {
         )}
 
         {openedCapsule && (
-          <div className="card bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200">
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 border-l-4 border-l-[#714cb6]">
             <div className="text-center mb-4">
               <div className="text-4xl mb-2">📬</div>
-              <h3 className="text-lg font-bold text-slate-900">时光胶囊已开启</h3>
-              <p className="text-slate-600 mt-2 italic">&ldquo;{openedCapsule.goal}&rdquo;</p>
+              <h3 className="text-lg text-[#292827]" style={{ fontWeight: 460 }}>时光胶囊已开启</h3>
+              <p className="text-[#666666] mt-2 italic">&ldquo;{openedCapsule.goal}&rdquo;</p>
             </div>
             {openedCapsule.thenScores && openedCapsule.currentScores && (
               <div className="grid grid-cols-3 gap-3 mt-4">
@@ -149,11 +148,11 @@ export default function TimeCapsulePage() {
                   { label: "抗压力", then: openedCapsule.thenScores.grit, now: openedCapsule.currentScores.grit },
                   { label: "表达力", then: openedCapsule.thenScores.express, now: openedCapsule.currentScores.express },
                 ].map(({ label, then, now }) => (
-                  <div key={label} className="text-center bg-white rounded-lg p-2">
-                    <div className="text-xs text-slate-500">{label}</div>
-                    <div className="text-sm text-slate-400 line-through">{Math.round(then)}</div>
-                    <div className="text-lg font-bold text-indigo-600">{Math.round(now)}</div>
-                    <div className={`text-xs font-medium ${now > then ? "text-green-600" : "text-slate-400"}`}>
+                  <div key={label} className="text-center bg-[#f2f0eb] rounded-xl p-2 border border-[#e3e3e2]">
+                    <div className="text-xs text-[#666666]">{label}</div>
+                    <div className="text-sm text-[#666666] line-through">{Math.round(then)}</div>
+                    <div className="text-lg text-[#714cb6]" style={{ fontWeight: 540 }}>{Math.round(now)}</div>
+                    <div className={`text-xs ${now > then ? "text-[#0c4243]" : "text-[#666666]"}`} style={{ fontWeight: 540 }}>
                       {now > then ? `+${Math.round(now - then)}` : "0"}
                     </div>
                   </div>
@@ -164,10 +163,10 @@ export default function TimeCapsulePage() {
         )}
 
         {capsules.length === 0 && !showForm ? (
-          <div className="card text-center py-12">
+          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-8 text-center">
             <div className="text-5xl mb-4">💊</div>
-            <h2 className="text-xl font-semibold text-slate-700 mb-2">还没有时光胶囊</h2>
-            <p className="text-slate-500 mb-4">给未来的自己设定一个目标，到时候看看你走了多远</p>
+            <h2 className="text-xl text-[#292827] mb-2" style={{ fontWeight: 460 }}>还没有时光胶囊</h2>
+            <p className="text-[#666666] mb-4">给未来的自己设定一个目标，到时候看看你走了多远</p>
             <button onClick={() => setShowForm(true)} className="btn-primary">封存第一个胶囊</button>
           </div>
         ) : (
@@ -178,26 +177,26 @@ export default function TimeCapsulePage() {
                 : null;
 
               return (
-                <div key={c.id} className="card">
+                <div key={c.id} className="bg-white border border-[#e3e3e2] rounded-2xl p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <p className="font-medium text-slate-900">{c.goal}</p>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-[#292827]" style={{ fontWeight: 540 }}>{c.goal}</p>
+                      <p className="text-xs text-[#666666] mt-1">
                         封存于 {new Date(c.writtenAt).toLocaleDateString()}
                         {c.openDates.length > 0 && ` · ${c.openDates.length} 个开启日期`}
                       </p>
                     </div>
                     <div className="text-right">
                       {c.openedAt ? (
-                        <span className="text-xs px-2 py-0.5 bg-green-50 text-green-600 rounded-full">已开启</span>
+                        <span className="text-xs px-2 py-0.5 bg-[#0c4243]/10 text-[#0c4243] rounded-full">已开启</span>
                       ) : c.isReadyToOpen ? (
-                        <button onClick={() => handleOpen(c.id)} className="text-xs px-3 py-1 bg-indigo-600 text-white rounded-full hover:bg-indigo-700">
+                        <button onClick={() => handleOpen(c.id)} className="text-xs px-3 py-1 bg-[#421d24] text-white rounded-full hover:bg-[#5a2830]">
                           立即开启
                         </button>
                       ) : daysToOpen !== null ? (
-                        <span className="text-xs px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full">{daysToOpen} 天后开启</span>
+                        <span className="text-xs px-2 py-0.5 bg-[#d4c7ff]/30 text-[#714cb6] rounded-full">{daysToOpen} 天后开启</span>
                       ) : (
-                        <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-400 rounded-full">等待中</span>
+                        <span className="text-xs px-2 py-0.5 bg-[#e3e3e2] text-[#666666] rounded-full">等待中</span>
                       )}
                     </div>
                   </div>

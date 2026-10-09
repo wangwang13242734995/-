@@ -1,57 +1,70 @@
 import Link from "next/link";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
-      <header className="bg-white border-b border-slate-100">
-        <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-indigo-600">履程</span>
-            <span className="text-xs text-slate-400 hidden sm:inline">Growth Map</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/auth/login" className="text-sm text-slate-600 hover:text-slate-900">
-              登录
-            </Link>
-            <Link href="/auth/register" className="btn-primary text-sm">
-              免费注册
-            </Link>
-          </div>
-        </nav>
-      </header>
+    <div className="min-h-screen flex flex-col">
+      <Header />
 
-      <main>
-        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-20 px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
+      <main className="flex-1">
+        {/* Hero — Gradient Atmospheric Band */}
+        <section className="relative overflow-hidden py-24 px-6">
+          {/* Gradient Composition */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(ellipse 600px 400px at 68% 50%, rgba(113,76,182,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 350px at 93% 50%, rgba(59,130,246,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 300px at 50% 98%, rgba(236,72,153,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 500px 300px at 30% 75%, rgba(6,182,212,0.06) 0%, transparent 60%)
+              `,
+            }}
+          />
+          <div className="relative max-w-[1200px] mx-auto text-center">
+            <h1
+              className="text-[#292827] leading-[0.96] tracking-[-0.028em]"
+              style={{ fontSize: "clamp(40px, 6vw, 64px)", fontWeight: 460 }}
+            >
               让每一步成长
               <br />
-              <span className="text-indigo-600">都被看见、被认证</span>
+              <span className="text-[#421d24]">都被看见、被认证</span>
             </h1>
-            <p className="text-lg text-slate-500 mt-6 max-w-2xl mx-auto">
+            <p className="text-lg text-[#666666] mt-6 max-w-2xl mx-auto leading-relaxed" style={{ fontWeight: 400 }}>
               不看学历，看能力。用结构化的项目记录和成长轨迹，
               向用人单位展示你的真实能力——30 秒生成能力名片。
             </p>
-            <div className="flex items-center justify-center gap-4 mt-8">
-              <Link href="/auth/register" className="btn-primary text-lg px-8 py-3">
+            <div className="flex items-center justify-center gap-4 mt-10">
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center gap-2 px-8 py-3 bg-[#421d24] text-white rounded-2xl hover:bg-[#5a2830] transition-colors"
+                style={{ fontWeight: 460, fontSize: 16 }}
+              >
                 开始记录成长
+                <span className="text-sm">→</span>
               </Link>
-              <Link href="#features" className="btn-secondary text-lg px-8 py-3">
+              <a
+                href="#features"
+                className="px-6 py-3 text-[#292827] hover:underline transition-colors"
+                style={{ fontWeight: 460, fontSize: 16 }}
+              >
                 了解更多
-              </Link>
+              </a>
             </div>
-            <p className="text-sm text-slate-400 mt-4">
+            <p className="text-sm text-[#666666] mt-6 opacity-70" style={{ fontWeight: 400 }}>
               面向大学生 · 免费使用 · 30 秒注册
             </p>
           </div>
         </section>
 
         {/* Problem Section */}
-        <section className="py-16 px-6 bg-white">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">
+        <section className="py-20 px-6">
+          <div className="max-w-[1200px] mx-auto">
+            <h2
+              className="text-[#292827] text-center mb-14 tracking-[-0.022em]"
+              style={{ fontSize: 28, fontWeight: 460, lineHeight: 1.14 }}
+            >
               85% 的大学生没有学历光环，如何证明自己？
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -60,26 +73,29 @@ export default function HomePage() {
                 { icon: "🎓", title: "学历不等于能力", desc: "名校毕业不代表能干活，双非学生也有很强的实战能力" },
                 { icon: "⏱️", title: "面试看不准", desc: "30 分钟面试判断一个人，试错成本是年薪的 1.5 倍" },
               ].map(({ icon, title, desc }) => (
-                <div key={title} className="card text-center">
+                <div key={title} className="bg-white border border-[#e3e3e2] rounded-2xl p-6 text-center">
                   <div className="text-4xl mb-4">{icon}</div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
-                  <p className="text-sm text-slate-500">{desc}</p>
+                  <h3 className="text-[#292827] mb-2" style={{ fontSize: 18, fontWeight: 540 }}>{title}</h3>
+                  <p className="text-sm text-[#666666] leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-16 px-6 bg-slate-50">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">
+        {/* Features — Dark Feature Band */}
+        <section id="features" className="py-20 px-6 bg-[#0c4243]">
+          <div className="max-w-[1200px] mx-auto">
+            <h2
+              className="text-white mb-4 tracking-[-0.022em]"
+              style={{ fontSize: 28, fontWeight: 460, lineHeight: 1.14 }}
+            >
               履程的解法：用数据说话
             </h2>
-            <p className="text-center text-slate-500 mb-12">
+            <p className="text-white/70 mb-14 max-w-lg" style={{ fontWeight: 400 }}>
               结构化记录你的项目经历，AI 自动分析六维能力，30 秒生成能力名片
             </p>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-5">
               {[
                 { icon: "📝", title: "结构化项目记录", desc: "不是写简历，而是填表记录。项目名称、角色、技术栈、遇到的困难、解决方案——结构化输入，标准化输出。" },
                 { icon: "🎯", title: "六维能力评估", desc: "专业力、学习力、自驱力、协作力、抗压力、表达力。由行为数据自动计算，不是你自己打分。" },
@@ -88,10 +104,10 @@ export default function HomePage() {
                 { icon: "🏆", title: "企业挑战赛", desc: "企业发布实战任务，学生参与挑战。即使没被选中，完成过程也沉淀到能力档案。" },
                 { icon: "🔍", title: "可信度标记", desc: "有 GitHub 链接、量化数据、他人评价的记录标记为高可信。让 HR 知道哪些数据是硬货。" },
               ].map(({ icon, title, desc }) => (
-                <div key={title} className="card">
-                  <div className="text-3xl mb-3">{icon}</div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
-                  <p className="text-sm text-slate-500">{desc}</p>
+                <div key={title} className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
+                  <div className="text-2xl mb-3">{icon}</div>
+                  <h3 className="text-white mb-1.5" style={{ fontSize: 17, fontWeight: 540 }}>{title}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -99,21 +115,26 @@ export default function HomePage() {
         </section>
 
         {/* How it works */}
-        <section className="py-16 px-6 bg-white">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">三步开始</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+        <section id="how-it-works" className="py-20 px-6">
+          <div className="max-w-[1200px] mx-auto">
+            <h2
+              className="text-[#292827] text-center mb-14 tracking-[-0.022em]"
+              style={{ fontSize: 28, fontWeight: 460, lineHeight: 1.14 }}
+            >
+              三步开始
+            </h2>
+            <div className="grid md:grid-cols-3 gap-10">
               {[
                 { step: "01", title: "注册并记录", desc: "注册账号，把你的课程项目、比赛、实习经历用结构化表单记录下来" },
                 { step: "02", title: "AI 自动分析", desc: "平台根据你的行为数据自动计算六维能力分数，每次记录后即时反馈" },
                 { step: "03", title: "分享给 HR", desc: "生成能力名片链接，放在简历上或直接发给用人单位，30 秒看懂你" },
               ].map(({ step, title, desc }) => (
                 <div key={step} className="text-center">
-                  <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-4">
+                  <div className="w-14 h-14 bg-[#d4c7ff] text-[#421d24] rounded-2xl flex items-center justify-center text-xl mx-auto mb-5" style={{ fontWeight: 540 }}>
                     {step}
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
-                  <p className="text-sm text-slate-500">{desc}</p>
+                  <h3 className="text-[#292827] mb-2" style={{ fontSize: 18, fontWeight: 540 }}>{title}</h3>
+                  <p className="text-sm text-[#666666] leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -121,28 +142,30 @@ export default function HomePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 px-6 bg-indigo-600">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">
+        <section className="py-20 px-6">
+          <div className="max-w-[800px] mx-auto text-center">
+            <h2
+              className="text-[#292827] mb-4 tracking-[-0.027em]"
+              style={{ fontSize: 40, fontWeight: 460, lineHeight: 1.2 }}
+            >
               你的每一步成长，都值得被看见
             </h2>
-            <p className="text-indigo-200 mb-8">
+            <p className="text-[#666666] mb-8 text-lg" style={{ fontWeight: 400 }}>
               加入履程，开始构建你的能力档案。免费、简单、30 秒注册。
             </p>
-            <Link href="/auth/register" className="inline-block px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition-colors">
+            <Link
+              href="/auth/register"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-[#421d24] text-white rounded-2xl hover:bg-[#5a2830] transition-colors"
+              style={{ fontWeight: 460, fontSize: 16 }}
+            >
               立即开始
+              <span className="text-sm">→</span>
             </Link>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-8 px-6">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-sm">
-          <span>履程 Growth Map</span>
-          <span>让每一步成长都被看见</span>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
