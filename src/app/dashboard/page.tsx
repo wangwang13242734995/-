@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AbilityRadar } from "@/components/AbilityRadar";
 import GrowthTrend from "@/components/GrowthTrend";
+import AchievementPanel from "@/components/AchievementPanel";
 
 interface DashboardData {
   latestScore: {
@@ -89,6 +90,36 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Weekly Review Quick Access */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Link
+            href="/weekly-review"
+            className="group bg-gradient-to-br from-emerald-50 to-white p-5 rounded-xl border border-emerald-100 hover:border-emerald-200 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 bg-emerald-100 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📊</div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-slate-900">本周复盘</h3>
+                <p className="text-xs text-slate-500 mt-0.5">看看这周你的能力变化</p>
+              </div>
+              <span className="text-emerald-600 text-sm font-medium group-hover:translate-x-1 transition-transform">查看 →</span>
+            </div>
+          </Link>
+          <Link
+            href="/challenges"
+            className="group bg-gradient-to-br from-amber-50 to-white p-5 rounded-xl border border-amber-100 hover:border-amber-200 hover:shadow-md transition-all"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">⚔️</div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-slate-900">挑战广场</h3>
+                <p className="text-xs text-slate-500 mt-0.5">企业真实任务，用能力解答</p>
+              </div>
+              <span className="text-amber-600 text-sm font-medium group-hover:translate-x-1 transition-transform">探索 →</span>
+            </div>
+          </Link>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-6">
           {/* Radar Chart */}
           <div className="card flex flex-col items-center">
@@ -164,6 +195,13 @@ export default function DashboardPage() {
             express: s.express,
             totalScore: s.totalScore,
           }))}
+        />
+
+        {/* Achievement Panel */}
+        <AchievementPanel
+          scores={scores}
+          projectCount={stats.projectCount}
+          streakDays={stats.streakDays}
         />
 
         {/* Recent Records */}
