@@ -61,6 +61,6 @@ RUN addgroup --system --gid 1001 nodejs \
  # 默认 DATABASE_URL（Railway 环境变量会覆盖这个值）
  ENV DATABASE_URL="file:/app/data/growth.db"
 
- # 启动：先确保数据库表存在，再启动 Next.js
- CMD ["sh", "-c", "node scripts/init-db.js || echo 'DB init warning: continuing anyway'; node server.js"]
+ # 启动：自动检测可写目录，强制设置 DATABASE_URL
+ CMD ["sh", "-c", "DB_DIR=/app/data; mkdir -p $DB_DIR 2>/dev/null || DB_DIR=/tmp; export DATABASE_URL=\"file:$DB_DIR/growth.db\"; echo \"Using $DATABASE_URL\"; node scripts/init-db.js || echo 'DB init warning'; node server.js"]
  
