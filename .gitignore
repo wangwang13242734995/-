@@ -46,3 +46,7 @@ prisma/dev.db
 next-env.d.ts
 
 /src/generated/prisma
+
+# temp scripts
+/test-*.js
+/check-status.js

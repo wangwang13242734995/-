@@ -33,9 +33,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           <Link href="/projects" className="link-violet text-sm">
             &larr; 返回项目列表
           </Link>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${credibilityColor}`}>
-            {credibilityLabel}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className={`text-xs px-2 py-0.5 rounded-full ${credibilityColor}`}>
+              {credibilityLabel}
+            </span>
+            <Link href={`/projects/${project.id}/edit`} className="text-sm px-3 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
+              编辑
+            </Link>
+          </div>
         </div>
 
         {/* Title Card */}

@@ -6,7 +6,7 @@ export default withAuth(
     const token = req.nextauth.token;
     const pathname = req.nextUrl.pathname;
 
-    if (pathname.startsWith("/dashboard") || pathname.startsWith("/projects")) {
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/projects") || pathname.startsWith("/records")) {
       if (!token) {
         return NextResponse.redirect(new URL("/auth/login", req.url));
       }
@@ -22,5 +22,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/projects/:path*", "/enterprise/:path*", "/time-capsule/:path*"],
+  matcher: ["/dashboard/:path*", "/projects/:path*", "/enterprise/:path*", "/time-capsule/:path*", "/records/:path*", "/settings/:path*"],
 };

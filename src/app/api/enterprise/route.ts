@@ -64,7 +64,12 @@ export async function GET() {
     const userId = (session.user as { id: string }).id;
     const enterprise = await prisma.enterprise.findUnique({
       where: { userId },
-      include: { challenges: true },
+      include: {
+        challenges: {
+          include: { _count: { select: { participations: true } } },
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     return NextResponse.json({ enterprise });

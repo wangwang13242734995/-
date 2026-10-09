@@ -44,6 +44,9 @@ export function Header() {
               <Link href="/challenges" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
                 挑战
               </Link>
+              <Link href="/records" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
+                记录
+              </Link>
               <Link href="/weekly-review" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
                 周复盘
               </Link>
@@ -64,6 +67,13 @@ export function Header() {
         <div className="flex items-center gap-3">
           {session ? (
             <>
+              <Link
+                href="/settings"
+                className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors"
+                style={{ fontWeight: 460 }}
+              >
+                设置
+              </Link>
               <Link
                 href={`/profile/${(session.user as { id: string })?.id}`}
                 className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors"

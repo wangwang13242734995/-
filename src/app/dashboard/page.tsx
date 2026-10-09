@@ -237,6 +237,10 @@ export default function DashboardPage() {
               <div className="text-2xl mb-2">📝</div>
               <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>记录新项目</p>
             </Link>
+            <Link href="/records" className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
+              <div className="text-2xl mb-2">🌱</div>
+              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>成长记录</p>
+            </Link>
             <Link href="/challenges" className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
               <div className="text-2xl mb-2">🏆</div>
               <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>发现挑战赛</p>
@@ -244,10 +248,6 @@ export default function DashboardPage() {
             <Link href={`/profile/${(session?.user as { id: string })?.id}`} className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
               <div className="text-2xl mb-2">🎯</div>
               <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>查看能力名片</p>
-            </Link>
-            <Link href="/projects" className="p-4 bg-[#f2f0eb] rounded-xl text-center hover:bg-[#d4c7ff]/30 transition-colors">
-              <div className="text-2xl mb-2">📋</div>
-              <p className="text-sm text-[#292827]" style={{ fontWeight: 540 }}>管理项目</p>
             </Link>
           </div>
         </div>

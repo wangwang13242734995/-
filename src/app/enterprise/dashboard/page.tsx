@@ -15,6 +15,7 @@ interface EnterpriseInfo {
     status: string;
     startDate: string;
     endDate: string;
+    _count?: { participations: number };
   }>;
 }
 
@@ -111,13 +112,20 @@ export default function EnterpriseDashboardPage() {
                     {new Date(c.startDate).toLocaleDateString()} - {new Date(c.endDate).toLocaleDateString()}
                   </p>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  c.status === "OPEN" ? "bg-[#0c4243]/10 text-[#0c4243]" :
-                  c.status === "DRAFT" ? "bg-[#e3e3e2] text-[#666666]" :
-                  "bg-[#d4c7ff]/30 text-[#714cb6]" 
-                }`}>
-                  {c.status}
-                </span>
+                <div className="flex items-center gap-3">
+                  {c.status === "OPEN" && (
+                    <Link href={`/enterprise/challenges/${c.id}/review`} className="text-sm px-3 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
+                      评审作品
+                    </Link>
+                  )}
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    c.status === "OPEN" ? "bg-[#0c4243]/10 text-[#0c4243]" :
+                    c.status === "DRAFT" ? "bg-[#e3e3e2] text-[#666666]" :
+                    "bg-[#d4c7ff]/30 text-[#714cb6]" 
+                  }`}>
+                    {c.status}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
