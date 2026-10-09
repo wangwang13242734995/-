@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# 安装 OpenSSL 3.x 确保 Prisma 生成正确的引擎
+RUN apk add --no-cache openssl
+
 # 安装依赖
 COPY package*.json ./
 RUN npm ci --only=production && npm ci
@@ -21,6 +24,9 @@ RUN npm run build
 FROM node:20-alpine AS runner
 
 WORKDIR /app
+
+# 运行时也需要 OpenSSL 3.x 库
+RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
