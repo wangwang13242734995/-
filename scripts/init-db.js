@@ -7,11 +7,15 @@ const { PrismaClient } = require("@prisma/client");
 const fs = require("fs");
 const path = require("path");
 
-// Ensure data directory exists for Railway volume mount
-const dataDir = "/data";
-if (!fs.existsSync(dataDir)) {
-  try { fs.mkdirSync(dataDir, { recursive: true }); } catch(e) { /* might not have perms */ }
+// Ensure data directory exists
+const dataDir = process.env.DATABASE_URL
+  ? path.dirname(process.env.DATABASE_URL.replace("file:", "")).replace(/\\/g, "/")
+  : "/app/data";
+if (dataDir && !fs.existsSync(dataDir)) {
+  try { fs.mkdirSync(dataDir, { recursive: true, mode: 0o755 }); } catch(e) { /* ignore */ }
 }
+console.log("DATABASE_URL:", process.env.DATABASE_URL || "NOT SET");
+console.log("Data dir:", dataDir);
 
 const prisma = new PrismaClient();
 

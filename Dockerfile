@@ -50,8 +50,8 @@ RUN addgroup --system --gid 1001 nodejs \
  # 复制数据库初始化脚本
  COPY --chown=nextjs:nodejs ./scripts ./scripts
 
- # SQLite 数据目录（挂载持久卷时使用）
- RUN mkdir -p /data && chown nextjs:nodejs /data
+ # SQLite 数据目录
+ RUN mkdir -p /app/data && chown -R nextjs:nodejs /app
 
  USER nextjs
 
@@ -59,7 +59,7 @@ RUN addgroup --system --gid 1001 nodejs \
  ENV PORT=3000
  ENV HOSTNAME="0.0.0.0"
  # 默认 DATABASE_URL（Railway 环境变量会覆盖这个值）
- ENV DATABASE_URL="file:/data/growth.db"
+ ENV DATABASE_URL="file:/app/data/growth.db"
 
  # 启动：先确保数据库表存在，再启动 Next.js
  CMD ["sh", "-c", "node scripts/init-db.js || echo 'DB init warning: continuing anyway'; node server.js"]
