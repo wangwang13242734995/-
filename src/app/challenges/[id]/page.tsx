@@ -21,7 +21,7 @@ interface ChallengeDetail {
   status: string;
   enterprise: { companyName: string; logo: string | null; industry: string | null; description: string | null };
   _count: { participations: number };
-  myParticipation: { id: string; status: string; submission: string | null } | null;
+  myParticipation: { id: string; status: string; submission: string | null; feedback: string | null; rank: number | null } | null;
 }
 
 const REWARD_LABELS: Record<string, string> = {
@@ -94,7 +94,7 @@ export default function ChallengeDetailPage() {
 
   const daysLeft = Math.max(0, Math.ceil((new Date(challenge.endDate).getTime() - Date.now()) / 86400000));
   const isParticipating = !!challenge.myParticipation;
-  const hasSubmitted = challenge.myParticipation?.status === "SUBMITTED";
+  const hasSubmitted = challenge.myParticipation?.status === "SUBMITTED" || challenge.myParticipation?.status === "ACCEPTED" || challenge.myParticipation?.status === "REJECTED";
 
   return (
     <div className="min-h-screen bg-[#f2f0eb] flex flex-col">
@@ -155,7 +155,20 @@ export default function ChallengeDetailPage() {
           </button>
         ) : hasSubmitted ? (
           <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 border-l-4 border-l-[#0c4243] text-center">
-            <p className="text-[#0c4243]" style={{ fontWeight: 540 }}>作品已提交，等待企业评审</p>
+            {challenge.myParticipation?.status === "ACCEPTED" ? (
+              <div>
+                <p className="text-[#0c4243] mb-1" style={{ fontWeight: 540 }}>🎉 作品已通过评审</p>
+                {challenge.myParticipation?.rank && <p className="text-sm text-[#714cb6]">排名：第 {challenge.myParticipation.rank} 名</p>}
+                {challenge.myParticipation?.feedback && <p className="text-sm text-[#666666] mt-2">{challenge.myParticipation.feedback}</p>}
+              </div>
+            ) : challenge.myParticipation?.status === "REJECTED" ? (
+              <div>
+                <p className="text-[#421d24] mb-1" style={{ fontWeight: 540 }}>作品未通过评审</p>
+                {challenge.myParticipation?.feedback && <p className="text-sm text-[#666666] mt-2">{challenge.myParticipation.feedback}</p>}
+              </div>
+            ) : (
+              <p className="text-[#0c4243]" style={{ fontWeight: 540 }}>作品已提交，等待企业评审</p>
+            )}
           </div>
         ) : (
           <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 space-y-4">
