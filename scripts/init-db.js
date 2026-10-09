@@ -4,6 +4,15 @@
  * Called at container startup before the Next.js server starts.
  */
 const { PrismaClient } = require("@prisma/client");
+const fs = require("fs");
+const path = require("path");
+
+// Ensure data directory exists for Railway volume mount
+const dataDir = "/data";
+if (!fs.existsSync(dataDir)) {
+  try { fs.mkdirSync(dataDir, { recursive: true }); } catch(e) { /* might not have perms */ }
+}
+
 const prisma = new PrismaClient();
 
 async function ensureTables() {

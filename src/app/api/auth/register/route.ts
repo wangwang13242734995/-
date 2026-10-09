@@ -66,8 +66,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    console.error("Register error:", error);
+    const msg = error instanceof Error ? error.message : "未知错误";
     return NextResponse.json(
-      { error: "注册失败，请稍后重试" },
+      { error: `注册失败: ${msg}` },
       { status: 500 }
     );
   }

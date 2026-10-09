@@ -2,7 +2,10 @@ node_modules
 .next
 .git
 .env
-dev.db
-check-status.js
-test-*.js
-README.md
+*.db
+*.db-journal
+prisma/dev.db
+coverage
+.DS_Store
+*.pem
+npm-debug.log*

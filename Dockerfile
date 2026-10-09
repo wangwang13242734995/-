@@ -52,7 +52,9 @@ RUN addgroup --system --gid 1001 nodejs \
  EXPOSE 3000
  ENV PORT=3000
  ENV HOSTNAME="0.0.0.0"
+ # 默认 DATABASE_URL（Railway 环境变量会覆盖这个值）
+ ENV DATABASE_URL="file:/data/growth.db"
 
  # 启动：先确保数据库表存在，再启动 Next.js
- CMD ["sh", "-c", "node scripts/init-db.js && node server.js"]
+ CMD ["sh", "-c", "node scripts/init-db.js || echo 'DB init warning: continuing anyway'; node server.js"]
  
