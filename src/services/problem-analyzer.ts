@@ -3,9 +3,10 @@
  * 核心能力：解析学生"遇到困难→解决问题"的过程描述，
  * 生成结构化能力洞察，评估问题解决深度、思维模式、学习信号。
  * 
- * 当前版本：基于规则的智能分析（无需 LLM API）
- * 扩展预留：interface 设计兼容未来接入 LLM 增强分析
+ * 双引擎模式：规则引擎（基础）+ InternLM LLM（增强）
  */
+
+import { callInternLM, isInternLMAvailable } from "./internlm";
 
 // === 类型定义 ===
 
@@ -327,4 +328,60 @@ function findEvidence(text: string, keywords: string[]): string | null {
     }
   }
   return null;
+}
+
+// === LLM 增强分析 ===
+
+/**
+ * 使用 InternLM 对分析结果进行深度增强
+ * 在规则引擎基础上，用 LLM 生成更有诗意和深度的能力洞察文案
+ */
+export async function analyzeWithLLM(
+  difficulty: string,
+  solution: string,
+  techStack: string[],
+  ruleResult: ProblemAnalysis
+): Promise<ProblemAnalysis> {
+  if (!isInternLMAvailable()) {
+    return ruleResult; // 无 token 时回退到规则引擎
+  }
+
+  try {
+    const prompt = `你是一个大学生能力评估专家。请根据以下学生的项目记录，生成一段有深度、有诗意的能力评价（80-150字）。
+
+要求：
+1. 引用学生描述中的原话关键词
+2. 使用比喻让评价更生动（如"把杯子换成湖"这类意象）
+3. 指出具体展现了哪些能力维度（专业力/学习力/自驱力/协作力/抗压力/表达力）
+4. 避免空泛套话，要有洞察感
+5. 最后用一句话概括这个学生的成长特质
+
+学生记录：
+- 遇到的困难：${difficulty}
+- 解决方案：${solution}
+- 技术栈：${techStack.join(", ")}
+- 规则引擎检测到的思维模式：${ruleResult.thinking.pattern.join(", ")}
+- 解决深度：${ruleResult.depth.level}
+
+请直接输出评价文字，不要加引号或前缀。`;
+
+    const llmSummary = await callInternLM(
+      [
+        { role: "system", content: "你是履程平台的能力分析师，擅长从学生的项目记录中发现独特的成长信号。文案风格追求诗意与深度。" },
+        { role: "user", content: prompt },
+      ],
+      { temperature: 0.8, maxTokens: 300 }
+    );
+
+    if (llmSummary && llmSummary.length > 20) {
+      return {
+        ...ruleResult,
+        summary: llmSummary.trim(),
+      };
+    }
+  } catch (error) {
+    console.error("InternLM analysis fallback:", error);
+  }
+
+  return ruleResult;
 }

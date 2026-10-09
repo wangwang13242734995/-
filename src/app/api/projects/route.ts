@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { calculateAbilityScores } from "@/services/ability-engine";
-import { analyzeProblemSolving } from "@/services/problem-analyzer";
+import { analyzeProblemSolving, analyzeWithLLM } from "@/services/problem-analyzer";
 
 const projectSchema = z.object({
   title: z.string().min(2, "项目名称至少 2 个字符"),
@@ -94,11 +94,17 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // AI 深度分析：解析“如何解决问题”生成能力洞察
-      const analysis = analyzeProblemSolving(
+      // AI 深度分析：规则引擎 + InternLM LLM 增强
+      const ruleAnalysis = analyzeProblemSolving(
         data.difficultyEncountered,
         data.solution,
         data.techStack
+      );
+      const analysis = await analyzeWithLLM(
+        data.difficultyEncountered,
+        data.solution,
+        data.techStack,
+        ruleAnalysis
       );
       await prisma.project.update({
         where: { id: project.id },
