@@ -7,9 +7,13 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => {
-        // 如果未登录，只有非注册页面才需要跳转
+      authorized: ({ token, req }) => {
         if (!token) return false;
+        // /admin 路径额外要求管理员角色
+        const pathname = req.nextUrl.pathname;
+        if (pathname.startsWith("/admin")) {
+          return (token as { role?: string }).role === "ADMIN";
+        }
         return true;
       },
     },
@@ -29,5 +33,6 @@ export const config = {
     "/enterprise/dashboard/:path*",
     "/profile/edit/:path*",
     "/time-capsule/:path*",
+    "/admin/:path*",
   ],
 };

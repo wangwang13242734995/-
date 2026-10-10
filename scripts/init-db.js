@@ -4,6 +4,7 @@
  * Called at container startup before the Next.js server starts.
  */
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
 
@@ -220,7 +221,32 @@ async function ensureTables() {
   console.log("Database tables ensured successfully");
 }
 
+// Idempotently provision the platform admin account so the review backend is usable
+// on a fresh deployment. Override via ADMIN_EMAIL / ADMIN_PASSWORD env in production.
+async function ensureAdmin() {
+  const email = process.env.ADMIN_EMAIL || "admin@test.com";
+  const password = process.env.ADMIN_PASSWORD || "admin123456";
+  try {
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      if (existing.role !== "ADMIN") {
+        await prisma.user.update({ where: { id: existing.id }, data: { role: "ADMIN" } });
+        console.log("Admin role promoted for", email);
+      }
+      return;
+    }
+    const hash = await bcrypt.hash(password, 10);
+    await prisma.user.create({
+      data: { name: "平台管理员", email, password: hash, role: "ADMIN" },
+    });
+    console.log("Admin account created:", email);
+  } catch (e) {
+    console.warn("ensureAdmin skipped:", e.message.slice(0, 100));
+  }
+}
+
 ensureTables()
+  .then(() => ensureAdmin())
   .catch((e) => {
     console.error("DB init error:", e);
     process.exit(1);

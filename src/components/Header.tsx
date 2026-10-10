@@ -115,6 +115,15 @@ export function Header() {
                   企业面板
                 </Link>
               )}
+              {(session.user as { role?: string })?.role === "ADMIN" && (
+                <Link
+                  href="/admin"
+                  className="text-sm px-3 py-1 bg-[#714cb6] text-white rounded-lg hover:bg-[#5f3fa0] transition-colors"
+                  style={{ fontWeight: 460 }}
+                >
+                  管理后台
+                </Link>
+              )}
               <Link
                 href="/settings"
                 className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors"
