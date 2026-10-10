@@ -53,7 +53,9 @@ RUN addgroup --system --gid 1001 nodejs \
  # SQLite 数据目录
  RUN mkdir -p /app/data && chown -R nextjs:nodejs /app
 
- USER nextjs
+ # Run as root so a Railway-mounted volume at /app/data is always writable
+ # (a non-root uid can hit permission errors and silently fall back to ephemeral /tmp).
+ USER root
 
  EXPOSE 3000
  ENV PORT=3000
