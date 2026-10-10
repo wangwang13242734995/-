@@ -90,6 +90,12 @@ export default function LoginPage() {
               立即注册
             </Link>
           </p>
+
+          <div className="border-t border-[#e3e3e2] pt-3 text-center">
+            <Link href="/enterprise/register" className="text-sm text-[#421d24] hover:underline" style={{ fontWeight: 460 }}>
+              我是企业，申请入驻 →
+            </Link>
+          </div>
         </form>
       </div>
     </div>

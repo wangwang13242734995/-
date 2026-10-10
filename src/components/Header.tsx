@@ -95,6 +95,9 @@ export function Header() {
               <a href="#how-it-works" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
                 怎么用
               </a>
+              <Link href="/enterprise/register" className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors" style={{ fontWeight: 460 }}>
+                企业入驻
+              </Link>
             </>
           )}
         </div>
