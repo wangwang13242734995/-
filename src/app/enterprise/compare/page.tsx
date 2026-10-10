@@ -150,7 +150,7 @@ function CompareContent() {
                 <td className="p-3 text-sm text-[#666666]">操作</td>
                 {students.map((s, i) => (
                   <td key={s.id} className={`text-center p-3 ${i === 0 ? "bg-[#d4c7ff]/10 rounded-b-2xl" : ""}`}>
-                    <Link href={`/profile/${s.id}`} className="text-sm text-[#714cb6] hover:underline">查看名片</Link>
+                    <Link href={`/enterprise/talents/${s.id}`} className="text-sm text-[#714cb6] hover:underline">查看名片</Link>
                   </td>
                 ))}
               </tr>

@@ -176,7 +176,7 @@ export default function TalentSearchPage() {
 
                 {/* Name + score */}
                 <div className="mt-3 text-center">
-                  <Link href={`/profile/${s.id}`} className="text-[#292827] hover:text-[#714cb6]" style={{ fontWeight: 540 }}>
+                  <Link href={`/enterprise/talents/${s.id}`} className="text-[#292827] hover:text-[#714cb6]" style={{ fontWeight: 540 }}>
                     {s.name}
                   </Link>
                   <div className="flex items-center justify-center gap-2 mt-1">
@@ -211,7 +211,7 @@ export default function TalentSearchPage() {
                       }`}>
                       {compareIds.includes(s.id) ? "已选" : "对比"}
                     </button>
-                    <Link href={`/profile/${s.id}`} className="text-xs text-[#714cb6] hover:underline">详情</Link>
+                    <Link href={`/enterprise/talents/${s.id}`} className="text-xs text-[#714cb6] hover:underline">详情</Link>
                   </div>
                 </div>
               </div>

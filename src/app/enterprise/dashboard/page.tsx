@@ -228,7 +228,7 @@ export default function EnterpriseDashboardPage() {
             </div>
             <div className="grid md:grid-cols-2 gap-3">
               {data.topTalents.slice(0, 6).map((t) => (
-                <Link key={t.id} href={`/profile/${t.id}`}
+                <Link key={t.id} href={`/enterprise/talents/${t.id}`}
                   className="bg-white border border-[#e3e3e2] rounded-2xl p-4 flex items-center gap-4 hover:border-[#714cb6] transition-colors">
                   {t.scores && <MiniRadar scores={t.scores} />}
                   <div className="flex-1 min-w-0">
