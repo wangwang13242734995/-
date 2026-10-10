@@ -257,8 +257,24 @@ async function ensureAdmin() {
 
 ensureTables()
   .then(() => ensureAdmin())
+  .then(() => ensureDemo())
   .catch((e) => {
     console.error("DB init error:", e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
+
+// Seed demo data (enterprise/students/challenges) so the app is usable out of the box.
+// Isolated in try/catch: a seed failure must never block tables/admin or container boot.
+async function ensureDemo() {
+  if (process.env.SEED_DEMO === "0" || process.env.SEED_DEMO === "false") {
+    console.log("Demo seed skipped (SEED_DEMO disabled)");
+    return;
+  }
+  try {
+    const { seedDemo } = require("./seed-demo");
+    await seedDemo(prisma);
+  } catch (e) {
+    console.warn("ensureDemo skipped:", e.message.slice(0, 160));
+  }
+}
