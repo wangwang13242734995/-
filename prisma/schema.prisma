@@ -128,19 +128,25 @@ model TimeCapsule {
 }
 
 model Enterprise {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyName  String
-  logo         String?
-  industry     String?
-  description  String?
-  website      String?
-  status       String   @default("PENDING")
-  rejectReason String?
-  verifiedAt   DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName     String
+  logo            String?
+  industry        String?
+  companySize     String?
+  description     String?
+  website         String?
+  contactPerson   String?
+  contactPosition String?
+  contactEmail    String?
+  address         String?
+  recruitingNeeds String?
+  status          String   @default("PENDING")
+  rejectReason    String?
+  verifiedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   challenges Challenge[]
 }

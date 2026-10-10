@@ -5,181 +5,223 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-interface EnterpriseInfo {
-  id: string;
-  companyName: string;
-  status: string;
-  challenges: Array<{
-    id: string;
-    title: string;
-    status: string;
-    startDate: string;
-    endDate: string;
-    _count?: { participations: number };
-  }>;
+interface DashboardData {
+  enterprise: { id: string; companyName: string; status: string; industry: string | null; companySize: string | null };
+  stats: { pendingReviews: number; totalParticipants: number; activeChallenges: number; totalChallenges: number };
+  challenges: Array<{ id: string; title: string; status: string; startDate: string; endDate: string; participantCount: number }>;
+  topTalents: Array<{ id: string; name: string; major: string | null; graduationYear: number | null; totalScore: number; scores: { craft: number; learn: number; drive: number; team: number; grit: number; express: number } | null; lastChallenge: string }>;
 }
 
 const STATUS_LABELS: Record<string, { text: string; color: string }> = {
   PENDING: { text: "审核中", color: "bg-[#d4c7ff]/30 text-[#714cb6]" },
-  APPROVED: { text: "已通过", color: "bg-[#0c4243]/10 text-[#0c4243]" },
-  REJECTED: { text: "已拒绝", color: "bg-[#421d24]/10 text-[#421d24]" },
+  APPROVED: { text: "已认证", color: "bg-[#0c4243]/10 text-[#0c4243]" },
+  REJECTED: { text: "未通过", color: "bg-[#421d24]/10 text-[#421d24]" },
 };
 
-const CHALLENGE_STATUS_LABELS: Record<string, string> = {
-  DRAFT: "草稿",
-  OPEN: "进行中",
-  CLOSED: "已关闭",
-  COMPLETED: "已完成",
-};
+function MiniRadar({ scores }: { scores: { craft: number; learn: number; drive: number; team: number; grit: number; express: number } }) {
+  const dims = [scores.craft, scores.learn, scores.drive, scores.team, scores.grit, scores.express];
+  const max = 100;
+  const cx = 30, cy = 30, r = 24;
+  const angle = (i: number) => (Math.PI * 2 * i) / 6 - Math.PI / 2;
+  const points = dims.map((v, i) => {
+    const ratio = v / max;
+    return `${cx + r * ratio * Math.cos(angle(i))},${cy + r * ratio * Math.sin(angle(i))}`;
+  }).join(" ");
+  const hexPoints = Array.from({ length: 6 }, (_, i) =>
+    `${cx + r * Math.cos(angle(i))},${cy + r * Math.sin(angle(i))}`
+  ).join(" ");
+
+  return (
+    <svg width="60" height="60" viewBox="0 0 60 60" className="shrink-0">
+      <polygon points={hexPoints} fill="none" stroke="#e3e3e2" strokeWidth="0.5" />
+      <polygon points={points} fill="#714cb6" fillOpacity="0.2" stroke="#714cb6" strokeWidth="1.5" />
+    </svg>
+  );
+}
 
 export default function EnterpriseDashboardPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { status: authStatus } = useSession();
   const router = useRouter();
-  const [enterprise, setEnterprise] = useState<EnterpriseInfo | null>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [statusMsg, setStatusMsg] = useState("");
-
-  const updateChallengeStatus = async (challengeId: string, newStatus: string) => {
-    try {
-      const res = await fetch(`/api/challenges/${challengeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setStatusMsg(data.error); return; }
-      setStatusMsg(`挑战赛状态已更新为 ${CHALLENGE_STATUS_LABELS[newStatus] || newStatus}`);
-      setEnterprise((prev) => prev ? {
-        ...prev,
-        challenges: prev.challenges.map((c) => c.id === challengeId ? { ...c, status: newStatus } : c)
-      } : prev);
-    } catch { setStatusMsg("操作失败"); }
-  };
 
   useEffect(() => {
     if (authStatus === "unauthenticated") { router.push("/auth/login"); return; }
-    fetch("/api/enterprise")
+    fetch("/api/enterprise/dashboard")
       .then((res) => res.json())
-      .then((data) => { setEnterprise(data.enterprise); setLoading(false); })
+      .then((d) => { setData(d.dashboard); setLoading(false); })
       .catch(() => setLoading(false));
   }, [authStatus, router]);
 
   if (loading) return <div className="min-h-screen bg-[#f2f0eb] flex items-center justify-center text-[#666666]">加载中...</div>;
 
-  if (!enterprise) {
+  if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f2f0eb]">
         <div className="text-center">
           <div className="text-5xl mb-4">🏢</div>
           <h2 className="text-xl text-[#292827] mb-2" style={{ fontWeight: 460 }}>你还未认证企业</h2>
-          <p className="text-[#666666] mb-4">完成企业认证后即可发布挑战赛</p>
-          <Link href="/enterprise/register" className="btn-primary">去认证</Link>
+          <p className="text-[#666666] mb-4">完成企业认证后即可发布挑战赛、搜索人才</p>
+          <Link href="/enterprise/register" className="btn-primary">提交企业认证</Link>
         </div>
       </div>
     );
   }
 
-  const statusInfo = STATUS_LABELS[enterprise.status] || { text: enterprise.status, color: "bg-[#e3e3e2] text-[#666666]" };
+  const st = STATUS_LABELS[data.enterprise.status] || { text: data.enterprise.status, color: "bg-[#e3e3e2] text-[#666666]" };
 
   return (
     <div className="min-h-screen bg-[#f2f0eb]">
+      {/* Top bar */}
       <header className="bg-white/80 backdrop-blur-[12px] border-b border-[#e3e3e2] px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-[#292827]" style={{ fontSize: 20, fontWeight: 460 }}>{enterprise.companyName}</h1>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${statusInfo.color}`}>{statusInfo.text}</span>
+            <div className="w-8 h-8 bg-[#421d24] rounded-lg flex items-center justify-center text-white text-sm" style={{ fontWeight: 600 }}>
+              {data.enterprise.companyName.charAt(0)}
+            </div>
+            <div>
+              <h1 className="text-[#292827]" style={{ fontSize: 18, fontWeight: 540 }}>{data.enterprise.companyName}</h1>
+              <p className="text-xs text-[#666666]">{data.enterprise.industry} · {data.enterprise.companySize}</p>
+            </div>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${st.color}`}>{st.text}</span>
           </div>
           <div className="flex items-center gap-3">
-            {enterprise.status === "APPROVED" && (
-              <Link href="/enterprise/challenges/new" className="btn-primary text-sm">发布挑战赛</Link>
-            )}
-            {enterprise.status === "APPROVED" && (
-              <Link href="/enterprise/talents" className="btn-secondary text-sm">人才搜索</Link>
-            )}
-            <Link href="/dashboard" className="btn-secondary text-sm">学生仪表盘</Link>
+            <Link href="/dashboard" className="btn-secondary text-sm">学生视角</Link>
+            <Link href="/enterprise/talents" className="btn-secondary text-sm">人才搜索</Link>
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
-        {statusMsg && (
-          <div className={`p-3 rounded-xl text-sm ${statusMsg.includes("失败") || statusMsg.includes("无权限") ? "bg-[#421d24]/10 text-[#421d24] border border-[#421d24]/20" : "bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20"}`}>{statusMsg}</div>
-        )}
+      <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+        {/* Action bar - what needs doing NOW */}
+        <div className="grid md:grid-cols-3 gap-4">
+          {data.enterprise.status === "APPROVED" ? (
+            <>
+              <div className="bg-white border border-[#e3e3e2] rounded-2xl p-5 flex flex-col items-start">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 bg-[#421d24] rounded-full animate-pulse"></span>
+                  <span className="text-xs text-[#666666]">待评审</span>
+                </div>
+                <p className="text-3xl text-[#292827]" style={{ fontWeight: 460 }}>{data.stats.pendingReviews}</p>
+                <p className="text-sm text-[#666666] mt-1">份作品等待你的反馈</p>
+                {data.stats.pendingReviews > 0 && (
+                  <Link href={`/enterprise/challenges/${data.challenges.find(c => c.status === "OPEN")?.id || ""}/review`}
+                    className="mt-3 text-sm text-[#714cb6] hover:underline" style={{ fontWeight: 540 }}>
+                    立即评审 →
+                  </Link>
+                )}
+              </div>
 
-        {enterprise.status === "PENDING" && (
-          <div className="bg-white border border-[#d4c7ff] rounded-2xl p-4">
-            <p className="text-[#714cb6]">你的企业认证正在审核中，审核通过后即可发布挑战赛。</p>
-          </div>
-        )}
+              <div className="bg-white border border-[#e3e3e2] rounded-2xl p-5 flex flex-col items-start">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 bg-[#0c4243] rounded-full"></span>
+                  <span className="text-xs text-[#666666]">进行中</span>
+                </div>
+                <p className="text-3xl text-[#292827]" style={{ fontWeight: 460 }}>{data.stats.activeChallenges}</p>
+                <p className="text-sm text-[#666666] mt-1">个挑战赛 · {data.stats.totalParticipants} 人已参与</p>
+                <Link href="/enterprise/challenges/new" className="mt-3 text-sm text-[#714cb6] hover:underline" style={{ fontWeight: 540 }}>
+                  发布新挑战 →
+                </Link>
+              </div>
 
-        {enterprise.status === "REJECTED" && (
-          <div className="bg-white border border-[#421d24]/20 rounded-2xl p-4">
-            <p className="text-[#421d24]">企业认证未通过，请核实企业信息后重新提交。</p>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between">
-          <h2 className="text-[#292827]" style={{ fontSize: 18, fontWeight: 460 }}>我的挑战赛</h2>
-          <span className="text-sm text-[#666666]">{enterprise.challenges.length} 个</span>
+              <div className="bg-white border border-[#e3e3e2] rounded-2xl p-5 flex flex-col items-start">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 bg-[#714cb6] rounded-full"></span>
+                  <span className="text-xs text-[#666666]">人才池</span>
+                </div>
+                <p className="text-3xl text-[#292827]" style={{ fontWeight: 460 }}>{data.stats.totalParticipants}</p>
+                <p className="text-sm text-[#666666] mt-1">参与过你的挑战赛的学生</p>
+                <Link href="/enterprise/talents" className="mt-3 text-sm text-[#714cb6] hover:underline" style={{ fontWeight: 540 }}>
+                  发现更多人才 →
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="md:col-span-3 bg-white border border-[#d4c7ff] rounded-2xl p-6 text-center">
+              <p className="text-[#714cb6] mb-3" style={{ fontWeight: 460 }}>
+                {data.enterprise.status === "PENDING" ? "企业认证正在审核中，通过后即可使用全部功能" : "企业认证未通过"}
+              </p>
+              <Link href="/enterprise/register" className="btn-primary text-sm">完善企业信息</Link>
+            </div>
+          )}
         </div>
 
-        {enterprise.challenges.length === 0 ? (
-          <div className="bg-white border border-[#e3e3e2] rounded-2xl p-6 text-center py-12">
-            <div className="text-4xl mb-3">🏆</div>
-            <p className="text-[#666666] mb-4">还没有发布挑战赛</p>
-            {enterprise.status === "APPROVED" && (
-              <Link href="/enterprise/challenges/new" className="btn-primary">发布第一个挑战赛</Link>
+        {/* Recent talents from challenges */}
+        {data.topTalents.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[#292827]" style={{ fontSize: 18, fontWeight: 460 }}>近期参与者</h2>
+              <Link href="/enterprise/talents" className="text-sm text-[#714cb6] hover:underline">查看全部 →</Link>
+            </div>
+            <div className="grid md:grid-cols-2 gap-3">
+              {data.topTalents.slice(0, 6).map((t) => (
+                <Link key={t.id} href={`/profile/${t.id}`}
+                  className="bg-white border border-[#e3e3e2] rounded-2xl p-4 flex items-center gap-4 hover:border-[#714cb6] transition-colors">
+                  {t.scores && <MiniRadar scores={t.scores} />}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[#292827]" style={{ fontWeight: 540 }}>{t.name}</p>
+                    <p className="text-xs text-[#666666] mt-0.5 truncate">{t.lastChallenge}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs px-1.5 py-0.5 bg-[#d4c7ff]/30 text-[#714cb6] rounded" style={{ fontWeight: 540 }}>
+                        {Math.round(t.totalScore)}分
+                      </span>
+                      {t.graduationYear && <span className="text-xs text-[#666666]">{t.graduationYear}年</span>}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Challenge overview - compact */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[#292827]" style={{ fontSize: 18, fontWeight: 460 }}>挑战赛管理</h2>
+            {data.enterprise.status === "APPROVED" && (
+              <Link href="/enterprise/challenges/new" className="btn-primary text-sm">+ 新挑战</Link>
             )}
           </div>
-        ) : (
-          <div className="space-y-3">
-            {enterprise.challenges.map((c) => (
-              <div key={c.id} className="bg-white border border-[#e3e3e2] rounded-2xl p-5 flex items-center justify-between">
-                <div>
-                  <h3 className="text-[#292827]" style={{ fontWeight: 540 }}>{c.title}</h3>
-                  <p className="text-sm text-[#666666] mt-1">
-                    {new Date(c.startDate).toLocaleDateString()} - {new Date(c.endDate).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {c.status === "DRAFT" && (
-                    <button onClick={() => updateChallengeStatus(c.id, "OPEN")} className="text-xs px-2 py-1 bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20 rounded-full hover:bg-[#0c4243]/20 transition">
-                      发布
-                    </button>
-                  )}
-                  {c.status === "OPEN" && (
-                    <>
-                      <Link href={`/enterprise/challenges/${c.id}/review`} className="text-sm px-3 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
-                        评审作品
+          {data.challenges.length === 0 ? (
+            <div className="bg-white border border-[#e3e3e2] rounded-2xl p-8 text-center">
+              <p className="text-[#666666]">还没有发布挑战赛</p>
+            </div>
+          ) : (
+            <div className="bg-white border border-[#e3e3e2] rounded-2xl divide-y divide-[#e3e3e2]">
+              {data.challenges.slice(0, 6).map((c) => (
+                <div key={c.id} className="p-4 flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        c.status === "OPEN" ? "bg-[#0c4243]" : c.status === "DRAFT" ? "bg-[#e3e3e2]" : "bg-[#666666]"
+                      }`} />
+                      <span className="text-sm text-[#292827]" style={{ fontWeight: 460 }}>{c.title}</span>
+                    </div>
+                    <p className="text-xs text-[#666666] mt-1 ml-3.5">
+                      {new Date(c.startDate).toLocaleDateString()} — {new Date(c.endDate).toLocaleDateString()} · {c.participantCount} 人参与
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {c.status === "OPEN" && (
+                      <Link href={`/enterprise/challenges/${c.id}/review`}
+                        className="text-xs px-2.5 py-1 bg-[#d4c7ff]/30 text-[#714cb6] rounded-full hover:bg-[#d4c7ff]/50 transition">
+                        评审
                       </Link>
-                      <button onClick={() => updateChallengeStatus(c.id, "CLOSED")} className="text-xs px-2 py-1 bg-[#f2f0eb] text-[#666666] border border-[#e3e3e2] rounded-full hover:border-[#421d24] hover:text-[#421d24] transition">
-                        关闭
-                      </button>
-                    </>
-                  )}
-                  {c.status === "CLOSED" && (
-                    <>
-                      <button onClick={() => updateChallengeStatus(c.id, "OPEN")} className="text-xs px-2 py-1 bg-[#0c4243]/10 text-[#0c4243] border border-[#0c4243]/20 rounded-full hover:bg-[#0c4243]/20 transition">
-                        重新开放
-                      </button>
-                      <button onClick={() => updateChallengeStatus(c.id, "COMPLETED")} className="text-xs px-2 py-1 bg-[#d4c7ff]/30 text-[#714cb6] border border-[#d4c7ff] rounded-full hover:bg-[#d4c7ff]/50 transition">
-                        标记完成
-                      </button>
-                    </>
-                  )}
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    c.status === "OPEN" ? "bg-[#0c4243]/10 text-[#0c4243]" :
-                    c.status === "DRAFT" ? "bg-[#e3e3e2] text-[#666666]" :
-                    c.status === "COMPLETED" ? "bg-[#d4c7ff]/30 text-[#714cb6]" :
-                    "bg-[#f2f0eb] text-[#666666]" 
-                  }`}>
-                    {CHALLENGE_STATUS_LABELS[c.status] || c.status}
-                  </span>
+                    )}
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      c.status === "OPEN" ? "bg-[#0c4243]/10 text-[#0c4243]" :
+                      c.status === "DRAFT" ? "bg-[#e3e3e2] text-[#666666]" :
+                      c.status === "COMPLETED" ? "bg-[#d4c7ff]/30 text-[#714cb6]" :
+                      "bg-[#f2f0eb] text-[#666666]"
+                    }`}>
+                      {{ DRAFT: "草稿", OPEN: "进行中", CLOSED: "已关闭", COMPLETED: "已完成" }[c.status] || c.status}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );

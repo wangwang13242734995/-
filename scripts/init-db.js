@@ -118,8 +118,14 @@ async function ensureTables() {
       "companyName" TEXT NOT NULL,
       "logo" TEXT,
       "industry" TEXT,
+      "companySize" TEXT,
       "description" TEXT,
       "website" TEXT,
+      "contactPerson" TEXT,
+      "contactPosition" TEXT,
+      "contactEmail" TEXT,
+      "address" TEXT,
+      "recruitingNeeds" TEXT,
       "status" TEXT NOT NULL DEFAULT 'PENDING',
       "rejectReason" TEXT,
       "verifiedAt" DATETIME,
@@ -185,14 +191,21 @@ async function ensureTables() {
     `CREATE INDEX IF NOT EXISTS "ChallengeParticipation_challengeId_idx" ON "ChallengeParticipation"("challengeId")`,
     `CREATE UNIQUE INDEX IF NOT EXISTS "ChallengeParticipation_userId_challengeId_key" ON "ChallengeParticipation"("userId", "challengeId")`,
     `CREATE INDEX IF NOT EXISTS "Credential_userId_idx" ON "Credential"("userId")`,
+    // Migration: add new Enterprise columns for pre-existing tables (SQLite ignores duplicate-column errors)
+    `ALTER TABLE "Enterprise" ADD COLUMN "companySize" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "contactPerson" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "contactPosition" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "contactEmail" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "address" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "recruitingNeeds" TEXT`,
   ];
 
   for (const sql of statements) {
     try {
       await prisma.$executeRawUnsafe(sql);
     } catch (e) {
-      // Ignore "already exists" errors
-      if (!e.message.includes("already exists")) {
+      // Ignore "already exists" and "duplicate column" errors (idempotent migration)
+      if (!e.message.includes("already exists") && !e.message.includes("duplicate column")) {
         console.warn("SQL warning:", e.message.slice(0, 100));
       }
     }

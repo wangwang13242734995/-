@@ -103,6 +103,15 @@ export function Header() {
         <div className="flex items-center gap-3">
           {session ? (
             <>
+              {(session.user as { role?: string })?.role === "ENTERPRISE" && (
+                <Link
+                  href="/enterprise/dashboard"
+                  className="text-sm px-3 py-1 bg-[#421d24] text-white rounded-lg hover:bg-[#5a2830] transition-colors"
+                  style={{ fontWeight: 460 }}
+                >
+                  企业面板
+                </Link>
+              )}
               <Link
                 href="/settings"
                 className="text-sm text-[#292827] hover:text-[#714cb6] transition-colors"

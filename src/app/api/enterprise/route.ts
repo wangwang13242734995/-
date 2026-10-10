@@ -6,9 +6,15 @@ import { z } from "zod";
 
 const enterpriseSchema = z.object({
   companyName: z.string().min(2, "企业名称至少 2 个字符"),
-  industry: z.string().optional(),
-  description: z.string().optional(),
+  industry: z.string().min(1, "请选择行业"),
+  companySize: z.string().min(1, "请选择公司规模"),
+  description: z.string().min(20, "企业简介至少 20 个字符"),
   website: z.string().url().optional().or(z.literal("")),
+  contactPerson: z.string().min(2, "请填写联系人姓名"),
+  contactPosition: z.string().optional(),
+  contactEmail: z.string().email("请填写有效的联系邮箱"),
+  address: z.string().optional(),
+  recruitingNeeds: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -38,8 +44,14 @@ export async function POST(req: NextRequest) {
         userId,
         companyName: data.companyName,
         industry: data.industry,
+        companySize: data.companySize,
         description: data.description,
         website: data.website || null,
+        contactPerson: data.contactPerson,
+        contactPosition: data.contactPosition || null,
+        contactEmail: data.contactEmail,
+        address: data.address || null,
+        recruitingNeeds: data.recruitingNeeds || null,
         status: "PENDING",
       },
     });
