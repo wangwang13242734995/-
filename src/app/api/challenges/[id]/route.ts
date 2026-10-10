@@ -14,7 +14,7 @@ export async function GET(
     const challenge = await prisma.challenge.findUnique({
       where: { id },
       include: {
-        enterprise: { select: { companyName: true, logo: true, industry: true, description: true } },
+        enterprise: { select: { companyName: true, logo: true, industry: true, description: true, verificationLevel: true } },
         _count: { select: { participations: true } },
       },
     });

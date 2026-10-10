@@ -119,6 +119,9 @@ async function ensureTables() {
       "logo" TEXT,
       "industry" TEXT,
       "companySize" TEXT,
+      "creditCode" TEXT,
+      "legalPerson" TEXT,
+      "verificationLevel" TEXT NOT NULL DEFAULT 'BASIC',
       "description" TEXT,
       "website" TEXT,
       "contactPerson" TEXT,
@@ -198,6 +201,9 @@ async function ensureTables() {
     `ALTER TABLE "Enterprise" ADD COLUMN "contactEmail" TEXT`,
     `ALTER TABLE "Enterprise" ADD COLUMN "address" TEXT`,
     `ALTER TABLE "Enterprise" ADD COLUMN "recruitingNeeds" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "creditCode" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "legalPerson" TEXT`,
+    `ALTER TABLE "Enterprise" ADD COLUMN "verificationLevel" TEXT NOT NULL DEFAULT 'BASIC'`,
   ];
 
   for (const sql of statements) {

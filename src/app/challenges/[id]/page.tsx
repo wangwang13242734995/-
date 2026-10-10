@@ -19,7 +19,7 @@ interface ChallengeDetail {
   rewardType: string;
   rewardDetail: string | null;
   status: string;
-  enterprise: { companyName: string; logo: string | null; industry: string | null; description: string | null };
+  enterprise: { companyName: string; logo: string | null; industry: string | null; description: string | null; verificationLevel?: string };
   _count: { participations: number };
   myParticipation: { id: string; status: string; submission: string | null; feedback: string | null; rank: number | null } | null;
 }
@@ -119,7 +119,12 @@ export default function ChallengeDetailPage() {
               {challenge.enterprise.companyName.charAt(0)}
             </div>
             <div>
-              <p className="text-[#292827]" style={{ fontWeight: 540 }}>{challenge.enterprise.companyName}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-[#292827]" style={{ fontWeight: 540 }}>{challenge.enterprise.companyName}</p>
+                {challenge.enterprise.verificationLevel === "DEEP" && (
+                  <span className="text-[10px] px-1.5 py-0.5 bg-[#0c4243] text-white rounded-full" style={{ fontWeight: 540 }}>✅ 已核验企业</span>
+                )}
+              </div>
               <p className="text-xs text-[#666666]">{challenge.enterprise.industry}</p>
             </div>
           </div>

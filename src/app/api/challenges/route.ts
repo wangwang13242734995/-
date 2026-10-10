@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     const challenges = await prisma.challenge.findMany({
       where,
       include: {
-        enterprise: { select: { companyName: true, logo: true } },
+        enterprise: { select: { companyName: true, logo: true, verificationLevel: true } },
         _count: { select: { participations: true } },
       },
       orderBy: { createdAt: "desc" },

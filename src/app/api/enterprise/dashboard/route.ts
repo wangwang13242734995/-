@@ -88,6 +88,11 @@ export async function GET() {
           status: enterprise.status,
           industry: enterprise.industry,
           companySize: enterprise.companySize,
+          verificationLevel: enterprise.verificationLevel,
+          creditCodeMasked: enterprise.creditCode
+            ? enterprise.creditCode.slice(0, 4) + "**********" + enterprise.creditCode.slice(-4)
+            : null,
+          legalPerson: enterprise.legalPerson,
         },
         stats: {
           pendingReviews: submittedCount,

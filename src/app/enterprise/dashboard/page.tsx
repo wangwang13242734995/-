@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface DashboardData {
-  enterprise: { id: string; companyName: string; status: string; industry: string | null; companySize: string | null };
+  enterprise: { id: string; companyName: string; status: string; industry: string | null; companySize: string | null; verificationLevel: string; creditCodeMasked: string | null; legalPerson: string | null };
   stats: { pendingReviews: number; totalParticipants: number; activeChallenges: number; totalChallenges: number };
   challenges: Array<{ id: string; title: string; status: string; startDate: string; endDate: string; participantCount: number }>;
   topTalents: Array<{ id: string; name: string; major: string | null; graduationYear: number | null; totalScore: number; scores: { craft: number; learn: number; drive: number; team: number; grit: number; express: number } | null; lastChallenge: string }>;
@@ -44,6 +44,32 @@ export default function EnterpriseDashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showVerify, setShowVerify] = useState(false);
+  const [legalPerson, setLegalPerson] = useState("");
+  const [blUrl, setBlUrl] = useState("");
+  const [verifyMsg, setVerifyMsg] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
+  const loadDashboard = () => {
+    fetch("/api/enterprise/dashboard")
+      .then((res) => res.json())
+      .then((d) => setData(d.dashboard));
+  };
+
+  const submitVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVerifying(true);
+    setVerifyMsg("");
+    const res = await fetch("/api/enterprise/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ legalPerson, businessLicenseUrl: blUrl || undefined }),
+    });
+    const d = await res.json();
+    setVerifyMsg(res.ok ? d.message : (d.error || "提交失败"));
+    if (res.ok) { setLegalPerson(""); setBlUrl(""); loadDashboard(); }
+    setVerifying(false);
+  };
 
   useEffect(() => {
     if (authStatus === "unauthenticated") { router.push("/auth/login"); return; }
@@ -145,6 +171,53 @@ export default function EnterpriseDashboardPage() {
             </div>
           )}
         </div>
+
+        {/* 企业认证状态（信任徽章） */}
+        <section className="bg-white border border-[#e3e3e2] rounded-2xl p-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              {data.enterprise.verificationLevel === "DEEP" ? (
+                <span className="text-xs px-2.5 py-1 bg-[#0c4243] text-white rounded-full" style={{ fontWeight: 540 }}>✅ 已核验企业</span>
+              ) : data.enterprise.verificationLevel === "PENDING_DEEP" ? (
+                <span className="text-xs px-2.5 py-1 bg-[#d4c7ff]/40 text-[#714cb6] rounded-full" style={{ fontWeight: 540 }}>深度认证审核中</span>
+              ) : (
+                <span className="text-xs px-2.5 py-1 bg-[#f2f0eb] text-[#666666] rounded-full border border-[#e3e3e2]" style={{ fontWeight: 540 }}>基础认证</span>
+              )}
+              {data.enterprise.creditCodeMasked && (
+                <span className="text-xs text-[#666666] font-mono">信用代码 {data.enterprise.creditCodeMasked}</span>
+              )}
+            </div>
+            {data.enterprise.verificationLevel === "BASIC" && (
+              <button onClick={() => setShowVerify((v) => !v)} className="text-sm text-[#714cb6] hover:underline" style={{ fontWeight: 540 }}>
+                申请「已核验」徽章 →
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-[#666666] mt-2">
+            {data.enterprise.verificationLevel === "DEEP"
+              ? "企业资质已通过人工核验，学生端将展示「已核验企业」标记，提升挑战赛吸引力。"
+              : data.enterprise.verificationLevel === "PENDING_DEEP"
+              ? "已提交法人信息，平台将比对国家企业公示系统，1-3 个工作日内完成核验。"
+              : "填写统一社会信用代码即完成基础认证。补充法人信息可申请深度核验徽章。"}
+          </p>
+
+          {showVerify && data.enterprise.verificationLevel === "BASIC" && (
+            <form onSubmit={submitVerify} className="mt-4 pt-4 border-t border-[#e3e3e2] grid md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-[#666666] mb-1">法人姓名 *</label>
+                <input type="text" value={legalPerson} onChange={(e) => setLegalPerson(e.target.value)} className="input-field" placeholder="营业执照法定代表人" required />
+              </div>
+              <div>
+                <label className="block text-xs text-[#666666] mb-1">企业公示链接（选填）</label>
+                <input type="url" value={blUrl} onChange={(e) => setBlUrl(e.target.value)} className="input-field" placeholder="https://www.gsxt.gov.cn/..." />
+              </div>
+              <div className="md:col-span-2 flex items-center gap-3">
+                <button type="submit" disabled={verifying} className="btn-primary text-sm">{verifying ? "提交中..." : "提交深度认证"}</button>
+                {verifyMsg && <span className="text-xs text-[#0c4243]">{verifyMsg}</span>}
+              </div>
+            </form>
+          )}
+        </section>
 
         {/* Recent talents from challenges */}
         {data.topTalents.length > 0 && (

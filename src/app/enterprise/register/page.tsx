@@ -20,6 +20,7 @@ export default function EnterpriseRegisterPage() {
     password: "",
     contactPosition: "",
     companyName: "",
+    creditCode: "",
     industry: "",
     companySize: "",
     description: "",
@@ -39,6 +40,7 @@ export default function EnterpriseRegisterPage() {
   };
   const validateStep2 = () => {
     if (!form.companyName || form.companyName.length < 2) return "请填写企业名称";
+    if (!/^[0-9A-HJ-NPQRTUWXY]{18}$/.test(form.creditCode.toUpperCase())) return "统一社会信用代码格式不正确（18 位数字/大写字母）";
     if (!form.industry) return "请选择所属行业";
     if (!form.companySize) return "请选择公司规模";
     if (!form.description || form.description.length < 20) return "企业简介至少 20 个字符";
@@ -152,6 +154,11 @@ export default function EnterpriseRegisterPage() {
             <div>
               <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 460 }}>企业名称 *</label>
               <input type="text" value={form.companyName} onChange={(e) => update("companyName", e.target.value)} className="input-field" placeholder="与营业执照一致的全称" />
+            </div>
+            <div>
+              <label className="block text-sm text-[#292827] mb-1" style={{ fontWeight: 460 }}>统一社会信用代码 *</label>
+              <input type="text" value={form.creditCode} onChange={(e) => update("creditCode", e.target.value.toUpperCase())} className="input-field font-mono" placeholder="18 位，如 91110000MA01XXXX0A" maxLength={18} />
+              <p className="text-xs text-[#666666] mt-1">营业执照上的 18 位代码，用于资质核验，不对外公开</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

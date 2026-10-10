@@ -13,6 +13,10 @@ const schema = z.object({
   contactPosition: z.string().optional(),
   // 企业信息
   companyName: z.string().min(2, "企业名称至少 2 个字符"),
+  creditCode: z
+    .string()
+    .length(18, "统一社会信用代码为 18 位")
+    .regex(/^[0-9A-HJ-NPQRTUWXY]{18}$/, "统一社会信用代码格式不正确（仅含数字与大写字母，不含 I/O/S/V/Z）"),
   industry: z.string().min(1, "请选择所属行业"),
   companySize: z.string().min(1, "请选择公司规模"),
   description: z.string().min(20, "企业简介至少 20 个字符"),
@@ -46,8 +50,10 @@ export async function POST(req: NextRequest) {
         data: {
           userId: user.id,
           companyName: data.companyName,
+          creditCode: data.creditCode,
           industry: data.industry,
           companySize: data.companySize,
+          verificationLevel: "BASIC",
           description: data.description,
           website: data.website || null,
           contactPerson: data.adminName,

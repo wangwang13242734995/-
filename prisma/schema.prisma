@@ -135,6 +135,9 @@ model Enterprise {
   logo            String?
   industry        String?
   companySize     String?
+  creditCode      String?
+  legalPerson     String?
+  verificationLevel String @default("BASIC")
   description     String?
   website         String?
   contactPerson   String?

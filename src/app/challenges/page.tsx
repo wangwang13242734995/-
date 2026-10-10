@@ -15,7 +15,7 @@ interface Challenge {
   rewardType: string;
   rewardDetail: string | null;
   maxParticipants: number;
-  enterprise: { companyName: string; logo: string | null };
+  enterprise: { companyName: string; logo: string | null; verificationLevel?: string };
   _count: { participations: number };
 }
 
@@ -102,6 +102,9 @@ export default function ChallengesPage() {
                       {challenge.enterprise.companyName.charAt(0)}
                     </div>
                     <span className="text-sm text-[#666666]">{challenge.enterprise.companyName}</span>
+                    {challenge.enterprise.verificationLevel === "DEEP" && (
+                      <span className="text-[10px] px-1.5 py-0.5 bg-[#0c4243] text-white rounded-full" style={{ fontWeight: 540 }}>已核验</span>
+                    )}
                   </div>
 
                   <h3 className="text-[#292827] mb-2 line-clamp-2" style={{ fontWeight: 540 }}>{challenge.title}</h3>
