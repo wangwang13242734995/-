@@ -4,7 +4,6 @@
  * Called at container startup before the Next.js server starts.
  */
 const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
 
@@ -226,6 +225,18 @@ async function ensureTables() {
 async function ensureAdmin() {
   const email = process.env.ADMIN_EMAIL || "admin@test.com";
   const password = process.env.ADMIN_PASSWORD || "admin123456";
+  // Precomputed bcrypt hash of the default password "admin123456". Used as a fallback
+  // when bcryptjs is unavailable in the standalone runtime image.
+  const DEFAULT_HASH = "$2b$10$b2DYpeRmEYp1AmcJXofh3eqJKeNiNamvOjTi7awgrVc3vN72ig66C";
+  let hash = DEFAULT_HASH;
+  try {
+    const bcrypt = require("bcryptjs");
+    hash = await bcrypt.hash(password, 10);
+  } catch (e) {
+    if (password !== "admin123456") {
+      console.warn("ADMIN_PASSWORD is set but bcryptjs unavailable; admin password will fall back to default.");
+    }
+  }
   try {
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -235,7 +246,6 @@ async function ensureAdmin() {
       }
       return;
     }
-    const hash = await bcrypt.hash(password, 10);
     await prisma.user.create({
       data: { name: "平台管理员", email, password: hash, role: "ADMIN" },
     });
