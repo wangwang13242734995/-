@@ -7,8 +7,8 @@ async function main() {
   const hash = await bcrypt.hash("password123", 10);
   const eUser = await p.user.upsert({
     where: { email: "enterprise@test.com" },
-    update: {},
-    create: { name: "TestEnterprise", email: "enterprise@test.com", password: hash },
+    update: { role: "ENTERPRISE" },
+    create: { name: "TestEnterprise", email: "enterprise@test.com", password: hash, role: "ENTERPRISE" },
   });
   console.log("Enterprise user:", eUser.id);
 
